@@ -2,6 +2,8 @@ package gr.hua.dit.fittrack.core.model.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 public class ProgressRecord {
 
@@ -14,10 +16,10 @@ public class ProgressRecord {
     private User user;
 
     @Column
-    private String date;
+    private LocalDate date;
 
     @Column
-    private Long weight;
+    private double weight;
 
     @Column
     private String notes;
@@ -35,19 +37,27 @@ public class ProgressRecord {
         this.id = id;
     }
 
-    public String getDate() {
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public Long getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(Long weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
