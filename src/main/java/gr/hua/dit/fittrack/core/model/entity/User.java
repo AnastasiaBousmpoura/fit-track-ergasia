@@ -9,9 +9,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     private Long id;
-    private String username;
+    private String userLastName;
     private String password;
-    private String role;
+    private Role role;
+    private String userFirstName;
+    private String emailAddress;
 
     public Long getId() {
         return id;
@@ -21,12 +23,23 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+//    public String getUsername() {
+//        return username;
+//    }
+
+    public void setUserFirstName(String userFirstName) {
+        this.userFirstName = userFirstName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getUserFirstName() {
+        return userFirstName;
+    }
+
+    public void setUserLastName(String userLastName) {
+        this.userLastName = userLastName;
+    }
+    public String getUserLastName() {
+        return userLastName;
     }
 
     public String getPassword() {
@@ -37,14 +50,23 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
     public User() {
+    }
+
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 }
