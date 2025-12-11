@@ -138,7 +138,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Δημιουργία JWT token
-        String token = jwtService.generateToken(
+        String token = jwtService.issue(
                 user.getEmailAddress(),
                 user.getRole().name()
         );
