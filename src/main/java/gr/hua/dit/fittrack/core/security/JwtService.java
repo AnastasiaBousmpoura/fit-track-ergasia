@@ -3,74 +3,67 @@ package gr.hua.dit.fittrack.core.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collection;
 import java.util.Date;
-import java.util.function.Function;
+import java.util.List;
 
 @Service
 public class JwtService {
 
-    @Value("${app.jwt.secret:change-me-secret}")
-    private String secretKeyString;
+    private final Key key;
+    private final String issuer;
+    private final String audience;
+    private final long ttlMinutes;
 
-    @Value("${app.jwt.validity-ms:86400000}") // 24 ώρες
-    private long validityInMs;
+    public JwtService(
+            @Value("${app.jwt.secret}") String secret,
+            @Value("${app.jwt.issuer}") String issuer,
+            @Value("${app.jwt.audience}") String audience,
+            @Value("${app.jwt.ttl-minutes}") long ttlMinutes
+    ) {
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        this.issuer = issuer;
+        this.audience = audience;
+        this.ttlMinutes = ttlMinutes;
+    }
 
-    // ----------------- ΒΑΣΙΚΟ: Δημιουργία token -----------------
-    public String generateToken(String email, String role) {
+    /** Issue token for multiple roles */
+    public String issue(String subject, Collection<String> roles) {
 
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMs);
+        Instant now = Instant.now();
 
         return Jwts.builder()
-                .setSubject(email)            // ποιος είναι ο χρήστης
-                .claim("role", role)          // ρόλος στο σύστημά σου
-                .setIssuedAt(now)             // πότε εκδόθηκε
-                .setExpiration(expiry)        // πότε λήγει
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .setSubject(subject)
+                .setIssuer(issuer)
+                .setAudience(audience)
+                .claim("roles", roles)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plus(Duration.ofMinutes(ttlMinutes))))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // ----------------- Χρήσιμες μέθοδοι ανάγνωσης -----------------
-
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    /** Convenience for one role */
+    public String issue(String subject, String role) {
+        return issue(subject, List.of(role));
     }
 
-    public String extractRole(String token) {
-        return extractAllClaims(token).get("role", String.class);
-    }
-
-    public boolean isTokenValid(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            return !claims.getExpiration().before(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ----------------- Εσωτερικά helpers -----------------
-
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    private Claims extractAllClaims(String token) {
+    /** Parse + validate token */
+    public Claims parse(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .requireIssuer(issuer)
+                .requireAudience(audience)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    private Key getSigningKey() {
-        // Χρησιμοποιεί το ίδιο secret που είχες πριν
-        return Keys.hmacShaKeyFor(secretKeyString.getBytes());
     }
 }
