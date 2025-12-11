@@ -11,7 +11,9 @@ public class User {
     private Long id;
     private String userLastName;
     private String password;
+    @Enumerated(EnumType.STRING)
     private Role role;
+
     private String userFirstName;
     private String emailAddress;
 
@@ -23,9 +25,6 @@ public class User {
         this.id = id;
     }
 
-//    public String getUsername() {
-//        return username;
-//    }
 
     public void setUserFirstName(String userFirstName) {
         this.userFirstName = userFirstName;
