@@ -11,4 +11,6 @@ public interface AvailabilityService {
     CreateAvailabilityResult createSlot(Long trainerId, LocalDateTime start, LocalDateTime end);
 
     List<TrainerAvailability> listSlotsForTrainer(Long trainerId);
+
+    void deleteSlot(Long trainerId, Long slotId);
 }

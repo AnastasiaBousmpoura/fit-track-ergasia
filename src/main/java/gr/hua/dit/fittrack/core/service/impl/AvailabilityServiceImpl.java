@@ -66,4 +66,15 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     public List<TrainerAvailability> listSlotsForTrainer(Long trainerId) {
         return availabilityRepository.findByTrainerId(trainerId);
     }
+
+    @Transactional
+    @Override
+    public void deleteSlot(Long trainerId, Long slotId) {
+        TrainerAvailability slot = availabilityRepository.findById(slotId).orElse(null);
+        if (slot == null) return; // δεν υπάρχει, απλά φεύγουμε
+        if (!slot.getTrainer().getId().equals(trainerId)) {
+            throw new RuntimeException("Trainer cannot delete this slot");
+        }
+        availabilityRepository.delete(slot);
+    }
 }
