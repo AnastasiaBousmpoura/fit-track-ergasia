@@ -86,4 +86,12 @@ public class AppointmentServiceImpl implements AppointmentService {
         return CreateAppointmentResult.success(saved);
     }
 
+    @Override
+    public void deleteAppointment(Long id) {
+        if (!appointmentRepository.existsById(id)) {
+            throw new RuntimeException("Το ραντεβού δεν βρέθηκε.");
+        }
+        appointmentRepository.deleteById(id);
+    }
+
 }

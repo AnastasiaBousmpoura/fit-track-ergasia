@@ -6,6 +6,7 @@ import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentResult;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -27,4 +28,16 @@ public class AppointmentRestController {
             return ResponseEntity.badRequest().body(result.reason());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAppointment(@PathVariable Long id) {
+        try {
+            appointmentService.deleteAppointment(id);
+            return ResponseEntity.ok("Το ραντεβού ακυρώθηκε με επιτυχία.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
 }
