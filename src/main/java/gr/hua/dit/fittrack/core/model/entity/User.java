@@ -22,6 +22,7 @@ public class User {
     private List<ProgressRecord> progressRecords = new ArrayList<>();
 
 
+
     private String userFirstName;
     private String emailAddress;
 

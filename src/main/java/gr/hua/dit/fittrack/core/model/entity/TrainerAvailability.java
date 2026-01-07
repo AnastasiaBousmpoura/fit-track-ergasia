@@ -30,4 +30,3 @@ public class TrainerAvailability {
     public LocalDateTime getEndTime() { return endTime; }
     public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
 }
-

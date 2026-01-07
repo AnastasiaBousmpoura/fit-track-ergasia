@@ -1,21 +1,23 @@
 package gr.hua.dit.fittrack.core.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
 @Entity
 public class ProgressRecord {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name= "id")
+    @Column(name = "id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate date;
 
     @Column
