@@ -25,44 +25,44 @@ public class AppointmentViewController {
     // 1. Εμφάνιση Φόρμας
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        // Προσθέτουμε ένα άδειο request object για το th:object της Thymeleaf
-        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(null, null, null, ""));
-        // Φέρνουμε τους trainers για το dropdown list [cite: 184]
+        // Χρησιμοποιούμε 1L για test αντί για null, για να μη "χτυπάει" το Service
+        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(1L, null, null, ""));
+
+        // Φέρνουμε τους trainers για το dropdown list
         model.addAttribute("trainers", trainerRepository.findAll());
-        return "appointments/create-appointment";
+
+        return "appointment-booking"; // HTML στο templates/appointment-booking.html
     }
 
-    // 2. Χειρισμός Υποβολής & Κανόνων [cite: 195, 197, 198]
+    // 2. Χειρισμός Υποβολής
     @PostMapping("/new")
     public String processAppointment(
             @Valid @ModelAttribute("appointmentRequest") CreateAppointmentRequest request,
             BindingResult bindingResult,
             Model model
     ) {
-        // Α) Validation UI: Έλεγχος @Future, @NotNull από το record [cite: 21]
+        // Α) Validation UI (π.χ. αν ξεχάστηκε κάποιο πεδίο)
         if (bindingResult.hasErrors()) {
             model.addAttribute("trainers", trainerRepository.findAll());
-            return "appointments/create-appointment";
+            return "appointment-booking";
         }
 
-        // Β) Εκτέλεση Logic & Κανόνων (Past dates, Availability, Busy Trainer) [cite: 197, 198]
-        CreateAppointmentResult result = appointmentService.createAppointment(request);
+        // Β) Εκτέλεση Logic (ΕΔΩ ΠΡΟΣΤΕΘΗΚΕ ΤΟ , true)
+        CreateAppointmentResult result = appointmentService.createAppointment(request, true);
 
         if (!result.created()) {
-            // Αν αποτύχει ένας κανόνας, στέλνουμε το reason στο UI [cite: 8]
             model.addAttribute("errorMessage", result.reason());
             model.addAttribute("trainers", trainerRepository.findAll());
-            return "appointments/create-appointment";
+            return "appointment-booking";
         }
 
-        // Γ) Επιτυχία
+        // Γ) Επιτυχία - Redirect στη λίστα
         return "redirect:/appointments/my-appointments?success";
     }
 
-    // 3. Προβολή Ιστορικού/Λίστας [cite: 162]
+    // 3. Προβολή Λίστας
     @GetMapping("/my-appointments")
     public String listAppointments(Model model) {
-        // Εδώ θα καλέσεις την υπηρεσία για να φέρεις τα ραντεβού του χρήστη
-        return "appointments/list";
+        return "appointment-list"; // HTML στο templates/appointment-list.html
     }
 }
