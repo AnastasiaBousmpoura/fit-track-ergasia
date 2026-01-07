@@ -53,7 +53,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
         // Δημιουργία slot
         TrainerAvailability slot = new TrainerAvailability();
-        slot.setTrainer(trainerId);
+        slot.setTrainer(trainer);
         slot.setStartTime(start);
         slot.setEndTime(end);
 
