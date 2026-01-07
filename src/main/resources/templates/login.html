@@ -59,12 +59,12 @@
 
                 <form th:action="@{/login}" method="post">
                     <div class="mb-3">
-                        <label class="form-label text-muted">Email</label>
+                        <label class="form-label text-white">Email</label>
                         <input type="email" name="username" class="form-control form-control-lg" placeholder="name@example.com" required>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label text-muted">Κωδικός Πρόσβασης</label>
+                        <label class="form-label text-white">Κωδικός Πρόσβασης</label>
                         <input type="password" name="password" class="form-control form-control-lg" placeholder="••••••••" required>
                     </div>
 
@@ -80,7 +80,7 @@
                     </div>
                 </form>
 
-                <p class="text-center mt-3 mb-0">
+                <p class="text-center mt-3 mb-0 text-muted">
                     Δεν έχεις λογαριασμό; <a th:href="@{/register}" class="text-decoration-none" style="color: #d4fc79;">Γίνε μέλος</a>
                 </p>
             </div>
