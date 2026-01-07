@@ -42,7 +42,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         }
 
         // Έλεγχος overlap
-        List<TrainerAvailability> existingSlots = availabilityRepository.findByTrainer(trainerId);
+        List<TrainerAvailability> existingSlots = availabilityRepository.findByTrainer_Id(trainerId);
         boolean overlaps = existingSlots.stream().anyMatch(slot ->
                 start.isBefore(slot.getEndTime()) && end.isAfter(slot.getStartTime())
         );
@@ -64,7 +64,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     @Override
     public List<TrainerAvailability> listSlotsForTrainer(Long trainerId) {
-        return availabilityRepository.findByTrainer(trainerId);
+        return availabilityRepository.findByTrainer_Id(trainerId);
     }
 
     @Transactional
