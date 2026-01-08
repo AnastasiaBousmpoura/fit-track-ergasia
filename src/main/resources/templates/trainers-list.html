@@ -38,9 +38,21 @@
                 <p class="text-muted small"><i class="bi bi-geo-alt"></i> <span th:text="${trainer.area}">Περιοχή</span></p>
 
                 <div class="mt-auto">
-                    <a th:href="@{/trainers/{id}(id=${trainer.id})}" class="btn btn-dark w-100">
-                        Λεπτομέρειες & Ραντεβού
-                    </a>
+                    <div th:with="isAuthenticated=${#authentication != null and #authentication.name != 'anonymousUser'}">
+
+                        <a th:if="${isAuthenticated}"
+                           th:href="@{/trainers/{id}(id=${trainer.id})}"
+                           class="btn btn-dark w-100 fw-bold">
+                            Λεπτομέρειες & Ραντεβού
+                        </a>
+
+                        <div th:unless="${isAuthenticated}" class="py-2">
+                            <hr>
+                            <a th:href="@{/login}" class="text-decoration-none fw-bold text-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Συνδέσου και κλείσε το ραντεβού σου
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
