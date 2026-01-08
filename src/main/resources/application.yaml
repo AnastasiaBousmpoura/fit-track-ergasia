@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: Fit Track
+
+  datasource:
+    # Προσθήκη AUTO_SERVER=TRUE για να μην κλειδώνει η βάση
+    url: jdbc:h2:file:./LOCAL_DATA/h2/app;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE
+    username: sa
+    password: changeme
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
+      hibernate.format_sql: true
+
+  # Προσθήκη cache ρυθμίσεων όπως του καθηγητή
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterWrite=10m
+
+server:
+  port: 8081
+
+# Swagger/OpenAPI ρυθμίσεις
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# Δικές σου ρυθμίσεις για JWT
+app:
+  jwt:
+    secret: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+    issuer: "fittrack"
+    audience: "fittrack-users"
+    ttl-minutes: 1440
+
+# Παράδειγμα ρυθμίσεων Routee (αν τις χρησιμοποιείς)
+routee:
+  app-id: 5bba56ece4b0a43fbf239aae
+  app-secret: kDsvtwHe3w
+  sender: HUANOC
