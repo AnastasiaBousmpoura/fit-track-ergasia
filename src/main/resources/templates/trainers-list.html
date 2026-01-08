@@ -27,33 +27,20 @@
         Δεν βρέθηκαν διαθέσιμοι trainers αυτή τη στιγμή.
     </div>
 
-    <div class="row g-4">
-        <div class="col-md-4" th:each="trainer : ${trainers}">
-            <div class="card h-100 trainer-card shadow-sm">
-                <div class="card-body text-center p-4">
-                    <div class="bg-light rounded-circle d-inline-block p-3 mb-3">
-                        <i class="bi bi-person-circle fs-1 trainer-icon"></i>
-                    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4" th:each="trainer : ${trainers}">
+            <div class="card h-100 shadow-sm text-center p-3">
+                <div class="mb-3">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="80">
+                </div>
+                <h4 th:text="${trainer.firstName + ' ' + trainer.lastName}">Όνομα</h4>
+                <p class="badge bg-primary-subtle text-primary" th:text="${trainer.specialization}">Ειδικότητα</p>
+                <p class="text-muted small"><i class="bi bi-geo-alt"></i> <span th:text="${trainer.area}">Περιοχή</span></p>
 
-                    <h4 class="card-title fw-bold mb-1"
-                        th:text="${trainer.firstName + ' ' + trainer.lastName}">
-                        Ονοματεπώνυμο Trainer
-                    </h4>
-
-                    <p class="badge bg-primary-subtle text-primary rounded-pill mb-3"
-                       th:text="${trainer.specialization}">
-                        Specialization
-                    </p>
-
-                    <p class="text-muted mb-3">
-                        <i class="bi bi-geo-alt"></i> <span th:text="${trainer.area}">Περιοχή</span>
-                    </p>
-
-                    <div class="d-grid pt-3">
-                        <a th:href="@{/trainer/{id}(id=${trainer.id})}" class="btn btn-dark py-2">
-                            Λεπτομέρειες & Ραντεβού
-                        </a>
-                    </div>
+                <div class="mt-auto">
+                    <a th:href="@{/trainers/{id}(id=${trainer.id})}" class="btn btn-dark w-100">
+                        Λεπτομέρειες & Ραντεβού
+                    </a>
                 </div>
             </div>
         </div>

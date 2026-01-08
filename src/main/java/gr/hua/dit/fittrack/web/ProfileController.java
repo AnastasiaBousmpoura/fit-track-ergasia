@@ -1,7 +1,9 @@
 package gr.hua.dit.fittrack.web;
 
 import gr.hua.dit.fittrack.core.model.entity.User;
+import gr.hua.dit.fittrack.core.model.entity.Trainer;
 import gr.hua.dit.fittrack.core.repository.UserRepository;
+import gr.hua.dit.fittrack.core.repository.TrainerRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,39 +14,30 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ProfileController {
 
     private final UserRepository userRepository;
+    private final TrainerRepository trainerRepository; // Προσθήκη repository
 
-    public ProfileController(UserRepository userRepository) {
+    public ProfileController(UserRepository userRepository, TrainerRepository trainerRepository) {
         this.userRepository = userRepository;
+        this.trainerRepository = trainerRepository;
     }
 
     @GetMapping("/profile")
     public String showProfile(Authentication authentication, Model model) {
-        // Η Spring Security ξέρει ποιος συνδέθηκε (το email του)
         String email = authentication.getName();
-
-        // Τον βρίσκουμε στη βάση δεδομένων
         User user = userRepository.findByEmailAddress(email)
                 .orElseThrow(() -> new RuntimeException("Ο χρήστης δεν βρέθηκε"));
-
-        // Περνάμε το αντικείμενο user στην HTML
         model.addAttribute("user", user);
-
-        return "profile"; // Θα ανοίξει το profile.html
-
+        return "profile";
     }
 
-    @GetMapping("/trainer/{id}")
+    // Το αλλάζουμε σε /trainers/{id} για να ταιριάζει με το link που συνήθως έχουμε
+    @GetMapping("/trainers/{id}")
     public String showTrainerProfile(@PathVariable Long id, Model model) {
-        // Ψάχνουμε τον Trainer στη βάση με βάση το ID
-        User trainer = userRepository.findById(id)
+        // Ψάχνουμε πλέον στο trainerRepository
+        Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ο Trainer δεν βρέθηκε"));
 
-        // Σιγουρευόμαστε ότι είναι όντως Trainer
-        if (!trainer.getRole().name().equals("TRAINER")) {
-            return "redirect:/"; // Αν δεν είναι trainer, γύρνα στην αρχική
-        }
-
         model.addAttribute("trainer", trainer);
-        return "trainer-profile"; // Θα φτιάξουμε αυτό το HTML
+        return "trainer-profile";
     }
 }

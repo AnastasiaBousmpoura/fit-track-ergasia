@@ -10,7 +10,8 @@ public class Trainer {
     private Long id;
 
     private String firstName; // Προσθήκη για την εκφώνηση
-    private String lastName;  // Προσθήκη για την εκφώνηση
+    private String lastName;// Προσθήκη για την εκφώνηση
+    private String email;
     private String specialization;
     private String area;
 
@@ -53,4 +54,12 @@ public class Trainer {
 
     public void setArea(String area)
     { this.area = area; }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }
