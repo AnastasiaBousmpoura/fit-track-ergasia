@@ -1,4 +1,4 @@
-package gr.hua.dit.fittrack.web;
+package gr.hua.dit.fittrack.web.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 

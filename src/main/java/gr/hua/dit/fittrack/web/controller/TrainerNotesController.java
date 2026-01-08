@@ -1,6 +1,7 @@
-package gr.hua.dit.fittrack.core.controller;
+package gr.hua.dit.fittrack.web.controller;
 
 import gr.hua.dit.fittrack.core.service.TrainerNotesService;
+import gr.hua.dit.fittrack.web.dto.TrainerNotesForm;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,7 +44,7 @@ public class TrainerNotesController {
             return "trainer_notes";
         }
 
-        var result = trainerNotesService.addNotes(appointmentId, form.text());
+        var result = trainerNotesService.addNotes(appointmentId, form.getText());
 
         if (!result.created()) {
             model.addAttribute("errorMessage", result.reason());

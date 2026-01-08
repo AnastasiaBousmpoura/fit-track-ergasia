@@ -1,7 +1,7 @@
-package gr.hua.dit.fittrack.web.api;
+package gr.hua.dit.fittrack.web.rest;
 
 import gr.hua.dit.fittrack.core.model.entity.ProgressRecord;
-import gr.hua.dit.fittrack.core.service.ProgressService;
+import gr.hua.dit.fittrack.core.service.impl.ProgressServiceImpl;
 import gr.hua.dit.fittrack.core.service.impl.dto.AddProgressRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +12,9 @@ import java.util.List;
 @RequestMapping("/api/progress")
 public class ProgressRestController {
 
-    private final ProgressService progressService;
+    private final ProgressServiceImpl progressService;
 
-    public ProgressRestController(ProgressService progressService) {
+    public ProgressRestController(ProgressServiceImpl progressService) {
         if (progressService == null) throw new NullPointerException();
         this.progressService = progressService;
     }

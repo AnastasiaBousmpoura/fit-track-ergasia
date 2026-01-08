@@ -1,4 +1,4 @@
-package gr.hua.dit.fittrack.core.controller;
+package gr.hua.dit.fittrack.web.dto;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;

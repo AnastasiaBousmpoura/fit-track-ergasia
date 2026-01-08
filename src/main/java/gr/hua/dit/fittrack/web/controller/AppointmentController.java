@@ -1,4 +1,4 @@
-package gr.hua.dit.fittrack.web;
+package gr.hua.dit.fittrack.web.controller;
 
 import gr.hua.dit.fittrack.core.service.AppointmentService;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentRequest;
@@ -12,57 +12,56 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/appointments")
-public class AppointmentViewController {
+public class AppointmentController {
 
     private final AppointmentService appointmentService;
     private final TrainerRepository trainerRepository;
 
-    public AppointmentViewController(AppointmentService appointmentService, TrainerRepository trainerRepository) {
+    public AppointmentController(AppointmentService appointmentService, TrainerRepository trainerRepository) {
         this.appointmentService = appointmentService;
         this.trainerRepository = trainerRepository;
     }
 
-    // 1. Εμφάνιση Φόρμας
-    @GetMapping("/new")
+    // Φόρμα για νέο ραντεβού
+    @GetMapping("/create")
     public String showCreateForm(Model model) {
-        // Χρησιμοποιούμε 1L για test αντί για null, για να μη "χτυπάει" το Service
-        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(1L, null, null, ""));
-
-        // Φέρνουμε τους trainers για το dropdown list
+        // Προετοιμασία του DTO για τη φόρμα
+        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(null, null, null, ""));
+        // Λίστα trainers για το dropdown
         model.addAttribute("trainers", trainerRepository.findAll());
-
-        return "appointment-booking"; // HTML στο templates/appointment-booking.html
+        return "appointments/create"; // appointments/create.html
     }
 
-    // 2. Χειρισμός Υποβολής
-    @PostMapping("/new")
-    public String processAppointment(
+    // Επεξεργασία της φόρμας και εφαρμογή των κανόνων
+    @PostMapping("/create")
+    public String processCreate(
             @Valid @ModelAttribute("appointmentRequest") CreateAppointmentRequest request,
             BindingResult bindingResult,
             Model model
     ) {
-        // Α) Validation UI (π.χ. αν ξεχάστηκε κάποιο πεδίο)
+        // 1. Validation UI (π.χ. αν λείπουν πεδία ή η ημερομηνία δεν είναι @Future)
         if (bindingResult.hasErrors()) {
             model.addAttribute("trainers", trainerRepository.findAll());
-            return "appointment-booking";
+            return "appointments/create";
         }
 
-        // Β) Εκτέλεση Logic (ΕΔΩ ΠΡΟΣΤΕΘΗΚΕ ΤΟ , true)
-        CreateAppointmentResult result = appointmentService.createAppointment(request, true);
+        // 2. Κλήση Service και έλεγχος των 3 κανόνων (Past date, Availability, Busy)
+        CreateAppointmentResult result = appointmentService.createAppointment(request);
 
         if (!result.created()) {
+            // Αν αποτύχει στέλνουμε το μήνυμα λάθους
             model.addAttribute("errorMessage", result.reason());
             model.addAttribute("trainers", trainerRepository.findAll());
-            return "appointment-booking";
+            return "appointments/appointment-booking";
         }
 
-        // Γ) Επιτυχία - Redirect στη λίστα
+        // 3. Επιτυχία - Ανακατεύθυνση στη λίστα
         return "redirect:/appointments/my-appointments?success";
     }
 
-    // 3. Προβολή Λίστας
-    @GetMapping("/my-appointments")
+    @GetMapping("/api/appointments/my-appointments")
     public String listAppointments(Model model) {
-        return "appointment-list"; // HTML στο templates/appointment-list.html
+        // ραντεβού χρήστη
+        return "appointments/appointment-list";
     }
 }

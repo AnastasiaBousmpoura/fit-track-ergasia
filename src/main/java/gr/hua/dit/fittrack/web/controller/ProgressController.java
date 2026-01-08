@@ -1,7 +1,7 @@
 package gr.hua.dit.fittrack.web.controller;
 
 import gr.hua.dit.fittrack.core.model.entity.ProgressRecord;
-import gr.hua.dit.fittrack.core.service.ProgressService;
+import gr.hua.dit.fittrack.core.service.impl.ProgressServiceImpl;
 import gr.hua.dit.fittrack.core.service.impl.dto.AddProgressRequest;
 import gr.hua.dit.fittrack.web.dto.CreateProgressForm;
 import jakarta.validation.Valid;
@@ -16,9 +16,9 @@ import java.util.List;
 @RequestMapping("/users/{userId}/progress")
 public class ProgressController {
 
-    private final ProgressService progressService;
+    private final ProgressServiceImpl progressService;
 
-    public ProgressController(ProgressService progressService) {
+    public ProgressController(ProgressServiceImpl progressService) {
         this.progressService = progressService;
     }
 

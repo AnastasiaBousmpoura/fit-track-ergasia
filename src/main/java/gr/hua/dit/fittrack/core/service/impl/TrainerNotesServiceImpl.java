@@ -23,10 +23,10 @@ public class TrainerNotesServiceImpl implements TrainerNotesService {
     private final CurrentUserProvider currentUserProvider;
 
     public TrainerNotesServiceImpl(
-            TrainerNotesRepository notesRepository,
-            AppointmentRepository appointmentRepository,
-            TrainerRepository trainerRepository,
-            CurrentUserProvider currentUserProvider
+            final TrainerNotesRepository notesRepository,
+            final AppointmentRepository appointmentRepository,
+            final TrainerRepository trainerRepository,
+            final CurrentUserProvider currentUserProvider
     ) {
         if (notesRepository == null) throw new NullPointerException();
         if (appointmentRepository == null) throw new NullPointerException();

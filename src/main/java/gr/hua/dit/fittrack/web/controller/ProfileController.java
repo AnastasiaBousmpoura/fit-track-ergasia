@@ -1,4 +1,4 @@
-package gr.hua.dit.fittrack.web;
+package gr.hua.dit.fittrack.web.controller;
 
 import gr.hua.dit.fittrack.core.model.entity.User;
 import gr.hua.dit.fittrack.core.model.entity.Trainer;

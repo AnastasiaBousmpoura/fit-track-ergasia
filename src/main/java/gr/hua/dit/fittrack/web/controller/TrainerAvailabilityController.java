@@ -1,9 +1,10 @@
-package gr.hua.dit.fittrack.core.controller;
+package gr.hua.dit.fittrack.web.controller;
 
 import gr.hua.dit.fittrack.core.model.entity.TrainerAvailability;
 import gr.hua.dit.fittrack.core.security.CurrentUserProvider;
 import gr.hua.dit.fittrack.core.service.AvailabilityService;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAvailabilityResult;
+import gr.hua.dit.fittrack.web.dto.AvailabilityForm;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -39,6 +40,7 @@ public class TrainerAvailabilityController {
                 this.availabilityService.listSlotsForTrainer(trainerId);
 
         model.addAttribute("slots", slots);
+        model.addAttribute("form", new AvailabilityForm());
         return "availability";
     }
 

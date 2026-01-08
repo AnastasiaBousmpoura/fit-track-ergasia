@@ -1,4 +1,4 @@
-package gr.hua.dit.fittrack.web;
+package gr.hua.dit.fittrack.web.controller;
 
 import gr.hua.dit.fittrack.core.repository.TrainerRepository; // Προσοχή στο σωστό πακέτο σου
 import org.springframework.stereotype.Controller;

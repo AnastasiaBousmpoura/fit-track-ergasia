@@ -1,4 +1,4 @@
-package gr.hua.dit.fittrack.web;
+package gr.hua.dit.fittrack.web.rest;
 
 import gr.hua.dit.fittrack.core.service.AppointmentService;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentRequest;
