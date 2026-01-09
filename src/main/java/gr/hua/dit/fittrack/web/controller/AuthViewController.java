@@ -15,7 +15,9 @@ public class AuthViewController {
 
     private final AuthService authService;
 
-    public AuthViewController(AuthService authService) {
+    public AuthViewController(final AuthService authService) {
+        if(authService == null) throw new NullPointerException();
+
         this.authService = authService;
     }
 

@@ -25,17 +25,26 @@ public class Appointment {
     private String type; // π.χ. "Yoga", "Crossfit", "Personal"
 
     @Column(length = 255)
-    private String notes; // <--- προστέθηκε
+    private String notes;
 
+    @Column(length = 80)
+    private String location;
+
+    @Column(length = 255)
+    private String weatherSummary;
+
+    // Constructors
     public Appointment() {
     }
 
-    public Appointment(User user, Trainer trainer, LocalDateTime dateTime, String type, String notes) {
+    public Appointment(User user, Trainer trainer, LocalDateTime dateTime, String type, String notes, String location, String weatherSummary) {
         this.user = user;
         this.trainer = trainer;
         this.dateTime = dateTime;
         this.type = type;
         this.notes = notes;
+        this.location = location;
+        this.weatherSummary = weatherSummary;
     }
 
     // Getters and Setters
@@ -55,5 +64,11 @@ public class Appointment {
     public void setType(String type) { this.type = type; }
 
     public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; } // <--- προστέθηκε
+    public void setNotes(String notes) { this.notes = notes; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public String getWeatherSummary() { return weatherSummary; }
+    public void setWeatherSummary(String weatherSummary) { this.weatherSummary = weatherSummary; }
 }
