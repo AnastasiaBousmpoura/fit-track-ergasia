@@ -18,8 +18,10 @@ public class AppointmentRestController {
         this.appointmentService = appointmentService;
     }
 
+    // Δημιουργία ραντεβού
     @PostMapping
     public ResponseEntity<?> createAppointment(@Valid @RequestBody CreateAppointmentRequest request) {
+        // Χρησιμοποιούμε default method χωρίς notify
         CreateAppointmentResult result = appointmentService.createAppointment(request);
 
         if (result.created()) {
@@ -29,6 +31,7 @@ public class AppointmentRestController {
         }
     }
 
+    // Ακύρωση ραντεβού
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAppointment(@PathVariable Long id) {
         try {
@@ -38,6 +41,4 @@ public class AppointmentRestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
-
 }

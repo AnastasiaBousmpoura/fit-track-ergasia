@@ -1,14 +1,22 @@
 package gr.hua.dit.fittrack.web.controller;
 
+import gr.hua.dit.fittrack.core.model.entity.Trainer;
+import gr.hua.dit.fittrack.core.model.entity.User;
+import gr.hua.dit.fittrack.core.repository.TrainerRepository;
+import gr.hua.dit.fittrack.core.repository.UserRepository;
 import gr.hua.dit.fittrack.core.service.AppointmentService;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentRequest;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentResult;
-import gr.hua.dit.fittrack.core.repository.TrainerRepository;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 @RequestMapping("/appointments")
@@ -16,52 +24,78 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
     private final TrainerRepository trainerRepository;
+    private final UserRepository userRepository;
 
-    public AppointmentController(AppointmentService appointmentService, TrainerRepository trainerRepository) {
+    public AppointmentController(AppointmentService appointmentService,
+                                 TrainerRepository trainerRepository,
+                                 UserRepository userRepository) {
         this.appointmentService = appointmentService;
         this.trainerRepository = trainerRepository;
+        this.userRepository = userRepository;
     }
 
-    // Φόρμα για νέο ραντεβού
+    // ------------------------
+    // Προβολή φόρμας δημιουργίας (GET)
+    // ------------------------
     @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        // Προετοιμασία του DTO για τη φόρμα
-        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(null, null, null, ""));
-        // Λίστα trainers για το dropdown
-        model.addAttribute("trainers", trainerRepository.findAll());
-        return "appointments/create"; // appointments/create.html
+    public String showCreateForm(@RequestParam("trainerId") Long trainerId, Model model, Authentication authentication) {
+        // 1. Βρίσκουμε τον συνδεδεμένο χρήστη από το email του
+        String email = authentication.getName();
+        User currentUser = userRepository.findByEmailAddress(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 2. Βρίσκουμε τον Trainer για τον οποίο γίνεται η κράτηση
+        Trainer trainer = trainerRepository.findById(trainerId)
+                .orElseThrow(() -> new RuntimeException("Trainer not found"));
+
+        // 3. Αρχικοποιούμε το Request με τα ID του χρήστη και του trainer
+        // Αυτό διασφαλίζει ότι τα hidden fields στη φόρμα θα έχουν τιμές
+        CreateAppointmentRequest request = new CreateAppointmentRequest(
+                currentUser.getId(),
+                trainerId,
+                null, // Το dateTime θα επιλεγεί από το dropdown
+                "",
+                ""
+        );
+
+        // 4. Φέρνουμε τα διαθέσιμα slots από το Service
+        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(trainerId);
+
+        // 5. Προσθήκη στο Model για το Thymeleaf
+        model.addAttribute("appointmentRequest", request);
+        model.addAttribute("trainer", trainer);
+        model.addAttribute("availableSlots", availableSlots);
+
+        return "create-appointment";
     }
 
-    // Επεξεργασία της φόρμας και εφαρμογή των κανόνων
+    // ------------------------
+    // Υποβολή φόρμας (POST)
+    // ------------------------
     @PostMapping("/create")
-    public String processCreate(
-            @Valid @ModelAttribute("appointmentRequest") CreateAppointmentRequest request,
-            BindingResult bindingResult,
-            Model model
-    ) {
-        // 1. Validation UI (π.χ. αν λείπουν πεδία ή η ημερομηνία δεν είναι @Future)
+    public String processCreate(@Valid @ModelAttribute("appointmentRequest") CreateAppointmentRequest request,
+                                BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+
+        // Αν υπάρχουν σφάλματα επικύρωσης (π.χ. κενά πεδία)
         if (bindingResult.hasErrors()) {
-            model.addAttribute("trainers", trainerRepository.findAll());
-            return "appointments/create";
+            model.addAttribute("trainer", trainerRepository.findById(request.trainerId()).orElse(null));
+            model.addAttribute("availableSlots", appointmentService.getAvailableSlots(request.trainerId()));
+            return "create-appointment";
         }
 
-        // 2. Κλήση Service και έλεγχος των 3 κανόνων (Past date, Availability, Busy)
-        CreateAppointmentResult result = appointmentService.createAppointment(request);
+        // Κλήση του Service για δημιουργία του ραντεβού
+        CreateAppointmentResult result = appointmentService.createAppointment(request, false);
 
+        // Αν το Service επιστρέψει αποτυχία (π.χ. η ώρα κλείστηκε ενδιάμεσα)
         if (!result.created()) {
-            // Αν αποτύχει στέλνουμε το μήνυμα λάθους
             model.addAttribute("errorMessage", result.reason());
-            model.addAttribute("trainers", trainerRepository.findAll());
-            return "appointments/appointment-booking";
+            model.addAttribute("trainer", trainerRepository.findById(request.trainerId()).orElse(null));
+            model.addAttribute("availableSlots", appointmentService.getAvailableSlots(request.trainerId()));
+            return "create-appointment";
         }
 
-        // 3. Επιτυχία - Ανακατεύθυνση στη λίστα
-        return "redirect:/appointments/my-appointments?success";
-    }
-
-    @GetMapping("/api/appointments/my-appointments")
-    public String listAppointments(Model model) {
-        // ραντεβού χρήστη
-        return "appointments/appointment-list";
+        // Επιτυχία: Ανακατεύθυνση στο προφίλ με μήνυμα
+        redirectAttributes.addFlashAttribute("success", "Το ραντεβού σας καταχωρήθηκε επιτυχώς!");
+        return "redirect:/profile";
     }
 }

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Διαθεσιμότητα Trainer</title>
+</head>
+<body>
+
+<h2>
+    Διαθεσιμότητα –
+    <span th:text="${trainer.firstName + ' ' + trainer.lastName}"></span>
+</h2>
+
+<div th:if="${#lists.isEmpty(slots)}">
+    Δεν υπάρχουν διαθέσιμες ώρες.
+</div>
+
+<ul>
+    <li th:each="slot : ${slots}">
+        <span>
+            <b th:text="${#temporals.format(slot.startTime, 'dd/MM/yyyy HH:mm')}"></b>
+            –
+            <b th:text="${#temporals.format(slot.endTime, 'HH:mm')}"></b>
+        </span>
+
+        <button disabled>
+            Κλείσε (αργότερα)
+        </button>
+    </li>
+</ul>
+
+</body>
+</html>

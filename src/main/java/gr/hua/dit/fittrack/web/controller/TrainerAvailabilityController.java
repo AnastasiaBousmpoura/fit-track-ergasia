@@ -1,88 +1,39 @@
 package gr.hua.dit.fittrack.web.controller;
 
-import gr.hua.dit.fittrack.core.model.entity.TrainerAvailability;
-import gr.hua.dit.fittrack.core.security.CurrentUserProvider;
-import gr.hua.dit.fittrack.core.service.AvailabilityService;
-import gr.hua.dit.fittrack.core.service.impl.dto.CreateAvailabilityResult;
-import gr.hua.dit.fittrack.web.dto.AvailabilityForm;
-import jakarta.validation.Valid;
-import org.springframework.security.access.prepost.PreAuthorize;
+import gr.hua.dit.fittrack.core.service.AppointmentService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/trainer/availability")
 public class TrainerAvailabilityController {
 
-    private final AvailabilityService availabilityService;
-    private final CurrentUserProvider currentUserProvider;
+    private final AppointmentService appointmentService;
 
-    public TrainerAvailabilityController(
-            final AvailabilityService availabilityService,
-            final CurrentUserProvider currentUserProvider
-    ) {
-        if (availabilityService==null) throw new NullPointerException();
-        if (currentUserProvider==null) throw new NullPointerException();
-
-        this.availabilityService = availabilityService;
-        this.currentUserProvider = currentUserProvider;
+    public TrainerAvailabilityController(AppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
     }
 
-    @PreAuthorize("hasRole('TRAINER')")
-    @GetMapping("")
-    public String list(final Model model) {
-        final Long trainerId = this.currentUserProvider.requiredTrainerId();
-        final List<TrainerAvailability> slots =
-                this.availabilityService.listSlotsForTrainer(trainerId);
+    @PostMapping("/set")
+    public String setAvailability(
+            @RequestParam Long trainerId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+            RedirectAttributes redirectAttributes) {
 
-        model.addAttribute("slots", slots);
-        model.addAttribute("form", new AvailabilityForm());
-        return "availability";
-    }
-
-    @GetMapping("/new")
-    public String showCreateForm(final Model model) {
-        model.addAttribute("form", new AvailabilityForm(null, null));
-        return "availability_new";
-    }
-
-    @PreAuthorize("hasRole('TRAINER')")
-    @PostMapping("/new")
-    public String handleCreateForm(
-            @ModelAttribute("form") @Valid final AvailabilityForm form,
-            final BindingResult bindingResult,
-            final Model model
-    ) {
-        if (bindingResult.hasErrors()) {
-            return "availability_new";
+        try {
+            appointmentService.setTrainerAvailability(trainerId, start, end);
+            redirectAttributes.addFlashAttribute("successMessage", "Το ωράριο αποθηκεύτηκε επιτυχώς!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Σφάλμα κατά την αποθήκευση: " + e.getMessage());
         }
 
-        final Long trainerId = this.currentUserProvider.requiredTrainerId();
-
-        final CreateAvailabilityResult result =
-                this.availabilityService.createSlot(
-                        trainerId,
-                        form.getStartTime(),
-                        form.getEndTime()
-                );
-
-        if (!result.created()) {
-            model.addAttribute("errorMessage", result.reason());
-            return "availability_new";
-        }
-
-        return "redirect:/trainer/availability";
-    }
-
-    @PreAuthorize("hasRole('TRAINER')")
-    @PostMapping("/{slotId}/delete")
-    public String delete(@PathVariable final Long slotId) {
-        final Long trainerId = this.currentUserProvider.requiredTrainerId();
-        this.availabilityService.deleteSlot(trainerId, slotId);
-        return "redirect:/trainer/availability";
+        return "redirect:/trainers"; // Ή όπου θέλεις να ανακατευθύνεις
     }
 }

@@ -21,17 +21,16 @@ public class User {
     private String userLastName;
     private String emailAddress;
 
-    // Πεδία για το Profile (Απαίτηση Εκφώνησης)
     private String fitnessGoal;
 
-    // Προσθήκη πεδίων για άμεση εμφάνιση στο Profile
-    private Double currentWeight;      // π.χ. 75.0
-    private Double runningTime;        // π.χ. 25.5 (λεπτά)
+    private Double currentWeight;
+    private Double runningTime;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // ΑΛΛΑΓΗ ΕΔΩ: Προσθήκη FetchType.EAGER για να μην κρασάρει το προφίλ
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProgressRecord> progressRecords = new ArrayList<>();
 
     // Constructors

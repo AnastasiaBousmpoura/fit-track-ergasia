@@ -22,11 +22,11 @@ public class AppointmentViewController {
         this.trainerRepository = trainerRepository;
     }
 
-    // 1. Εμφάνιση Φόρμας
+    // 1. Εμφάνιση φόρμας νέου ραντεβού
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        // Χρησιμοποιούμε 1L για test αντί για null, για να μη "χτυπάει" το Service
-        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(1L, null, null, ""));
+        // Χρησιμοποιούμε τον νέο constructor με default τιμές
+        model.addAttribute("appointmentRequest", new CreateAppointmentRequest());
 
         // Φέρνουμε τους trainers για το dropdown list
         model.addAttribute("trainers", trainerRepository.findAll());
@@ -34,20 +34,20 @@ public class AppointmentViewController {
         return "appointment-booking"; // HTML στο templates/appointment-booking.html
     }
 
-    // 2. Χειρισμός Υποβολής
+    // 2. Χειρισμός υποβολής φόρμας
     @PostMapping("/new")
     public String processAppointment(
             @Valid @ModelAttribute("appointmentRequest") CreateAppointmentRequest request,
             BindingResult bindingResult,
             Model model
     ) {
-        // Α) Validation UI (π.χ. αν ξεχάστηκε κάποιο πεδίο)
+        // Α) Έλεγχος validation
         if (bindingResult.hasErrors()) {
             model.addAttribute("trainers", trainerRepository.findAll());
             return "appointment-booking";
         }
 
-        // Β) Εκτέλεση Logic (ΕΔΩ ΠΡΟΣΤΕΘΗΚΕ ΤΟ , true)
+        // Β) Εκτέλεση λογικής δημιουργίας ραντεβού
         CreateAppointmentResult result = appointmentService.createAppointment(request, true);
 
         if (!result.created()) {
@@ -56,13 +56,15 @@ public class AppointmentViewController {
             return "appointment-booking";
         }
 
-        // Γ) Επιτυχία - Redirect στη λίστα
+        // Γ) Επιτυχία - Redirect στη λίστα των ραντεβού
         return "redirect:/appointments/my-appointments?success";
     }
 
-    // 3. Προβολή Λίστας
+    // 3. Προβολή λίστας ραντεβού χρήστη
     @GetMapping("/my-appointments")
     public String listAppointments(Model model) {
+        // Αν θέλεις μπορείς να φορτώσεις τα ραντεβού του χρήστη εδώ
+        // model.addAttribute("appointments", appointmentService.getUserAppointments(userId));
         return "appointment-list"; // HTML στο templates/appointment-list.html
     }
 }

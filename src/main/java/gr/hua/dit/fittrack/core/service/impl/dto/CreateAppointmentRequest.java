@@ -11,5 +11,11 @@ public record CreateAppointmentRequest(
         @NotNull Long userId,
         @NotNull Long trainerId,
         @NotNull @Future LocalDateTime dateTime,
-        @NotNull @NotBlank @Size(max = 50) String type
-){}
+        @NotNull @NotBlank @Size(max = 50) String type,
+        @Size(max = 255) String notes
+) {
+    // default constructor για Thymeleaf
+    public CreateAppointmentRequest() {
+        this(0L, 0L, LocalDateTime.now().plusDays(1), "", "");
+    }
+}
