@@ -11,5 +11,6 @@ public record CreateAppointmentRequest(
         @NotNull Long userId,
         @NotNull Long trainerId,
         @NotNull @Future LocalDateTime dateTime,
-        @NotNull @NotBlank @Size(max = 50) String type
+        @NotNull @NotBlank @Size(max = 50) String type,
+        @NotNull @NotBlank @Size(max = 80) String location
 ){}

@@ -8,6 +8,7 @@ import gr.hua.dit.fittrack.core.repository.TrainerAvailabilityRepository;
 import gr.hua.dit.fittrack.core.repository.TrainerRepository;
 import gr.hua.dit.fittrack.core.repository.UserRepository;
 import gr.hua.dit.fittrack.core.service.AppointmentService;
+import gr.hua.dit.fittrack.core.service.WeatherService;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentRequest;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentResult;
 import org.springframework.stereotype.Service;
@@ -21,18 +22,23 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final TrainerRepository trainerRepository;
     private final TrainerAvailabilityRepository trainerAvailabilityRepository;
+    private final WeatherService weatherService;
 
     public AppointmentServiceImpl(
             UserRepository userRepository,
             AppointmentRepository appointmentRepository,
             TrainerRepository trainerRepository,
-            TrainerAvailabilityRepository trainerAvailabilityRepository
+            TrainerAvailabilityRepository trainerAvailabilityRepository,
+            WeatherService weatherService
     ) {
         this.userRepository = userRepository;
         this.appointmentRepository = appointmentRepository;
         this.trainerRepository = trainerRepository;
         this.trainerAvailabilityRepository = trainerAvailabilityRepository;
+        this.weatherService = weatherService;
     }
+
+
 
     @Override
     public CreateAppointmentResult createAppointment(CreateAppointmentRequest req, boolean notify) {
@@ -80,6 +86,21 @@ public class AppointmentServiceImpl implements AppointmentService {
         appt.setTrainer(trainer);
         appt.setDateTime(req.dateTime());
         appt.setType(req.type());
+
+        // 6) Outdoor -> call Weather and store summary
+        if ("OUTDOOR".equalsIgnoreCase(req.type())) {
+            try {
+                // δεν έχεις location στο request/entity, βάλε ένα default
+                var weather = weatherService.getWeatherFor(req.dateTime(),"Athens");
+                if (weather != null && weather.getSummary() != null) {
+                    appt.setWeatherSummary(weather.getSummary());
+                }
+            } catch (Exception ex) {
+                // Μην “σπάσει” το booking αν πέσει το external API
+                appt.setWeatherSummary("Weather unavailable");
+            }
+        }
+
 
         Appointment saved = appointmentRepository.save(appt);
 

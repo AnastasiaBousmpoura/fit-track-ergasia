@@ -6,6 +6,24 @@ import java.time.LocalDateTime;
 @Entity
 public class Appointment {
 
+    private String type;
+
+    @Column(length = 255)
+    private String weatherSummary;
+
+    public String getWeatherSummary() { return weatherSummary; }
+    public void setWeatherSummary(String weatherSummary) { this.weatherSummary = weatherSummary; }
+
+
+    @Column(length = 80)
+    private String location;
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,7 +35,6 @@ public class Appointment {
     private Trainer trainer;
 
     private LocalDateTime dateTime;
-    private String type;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
