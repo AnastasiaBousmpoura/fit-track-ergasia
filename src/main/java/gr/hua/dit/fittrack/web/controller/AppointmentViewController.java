@@ -26,7 +26,7 @@ public class AppointmentViewController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         // Χρησιμοποιούμε 1L για test αντί για null, για να μη "χτυπάει" το Service
-        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(1L, null, null, ""));
+        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(1L, null, null, "","Athens"));
 
         // Φέρνουμε τους trainers για το dropdown list
         model.addAttribute("trainers", trainerRepository.findAll());

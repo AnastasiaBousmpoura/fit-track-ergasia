@@ -26,7 +26,7 @@ public class AppointmentController {
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         // Προετοιμασία του DTO για τη φόρμα
-        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(null, null, null, ""));
+        model.addAttribute("appointmentRequest", new CreateAppointmentRequest(null, null, null, "","Athens"));
         // Λίστα trainers για το dropdown
         model.addAttribute("trainers", trainerRepository.findAll());
         return "appointments/create"; // appointments/create.html
