@@ -15,63 +15,112 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Security configuration for FitTrack.
+ *
+ * - JWT για /api/**
+ * - Cookie-based login για HTML UI
+ */
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    /**
+     * 🔐 API chain (JWT, stateless)
+     * Περνάει ΜΟΝΟ τα endpoints που ξεκινούν από /api/**
+     */
     @Bean
     @Order(1)
-    public SecurityFilterChain apiChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        http.securityMatcher("/api/**")
+    public SecurityFilterChain apiChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) throws Exception {
+
+        http
+                .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sm ->
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/auth/**").permitAll()  // login/register στο API
+                        .anyRequest().authenticated()                // όλα τα άλλα θέλουν JWT
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable);
+
         return http.build();
     }
 
+
+    /**
+     * 🧑‍💻 UI chain (cookie-based login)
+     * Περνάει όλα τα non-API requests.
+     */
     @Bean
     @Order(2)
     public SecurityFilterChain uiChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/**")
-                .csrf(AbstractHttpConfigurer::disable)
+
+        http
+                // ΟΧΙ /api/** εδώ (αυτό το πιάνει το apiChain)
+                .securityMatcher("/**")
+
                 .authorizeHttpRequests(auth -> auth
-                        // ΔΗΜΟΣΙΑ: Προσθέτουμε το /trainers εδώ για να μπορεί ο καθένας να τους βλέπει
-                        // Χωρίς αυτό, το Spring σε αποσυνδέει/πετάει στο login κάθε φορά που πατάς τη λίστα
-                        .requestMatchers("/", "/login", "/register", "/trainers/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        // ✅ UI δημόσια endpoints
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/register",
+                                "/error",
+                                "/css/**", "/js/**", "/images/**"
+                        ).permitAll()
 
-                        // ΠΡΟΣΤΑΤΕΥΜΕΝΑ: Μόνο για συνδεδεμένους χρήστες
-                        .requestMatchers("/profile/**", "/appointments/**", "/availability/**").authenticated()
+                        // ✅ Swagger δημόσια (μόνο για να βλέπεις docs)
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
 
+                        // ✅ όλα τα άλλα UI θέλουν login
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/login")
-                        // Το true διασφαλίζει ότι το session "κλειδώνει" σωστά μετά την είσοδο
-                        .defaultSuccessUrl("/profile", true)
+                        // σημαντικό: να επιτρέπεται το POST /login
                         .permitAll()
+                        .defaultSuccessUrl("/profile", true)
                 )
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true)
                         .permitAll()
-                )
-                // Χρήση Session για το UI chain
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+                );
 
         return http.build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
+    /**
+     * Password encoding (BCrypt)
+     */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Authentication manager (necessary for login)
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config
+    ) throws Exception {
         return config.getAuthenticationManager();
     }
 }

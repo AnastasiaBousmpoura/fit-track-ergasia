@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -100,8 +101,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             // Invalid token ή εσωτερικό σφάλμα
             LOGGER.warn("JwtAuthenticationFilter failed", ex);
-            writeError(response);
-            return; // Σταματάμε εδώ
+            SecurityContextHolder.clearContext();
+            throw new BadCredentialsException("Invalid token");
+
         }
 
         // Αν όλα ΟΚ -> συνέχισε στο επόμενο φίλτρο / controller
