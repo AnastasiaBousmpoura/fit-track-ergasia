@@ -73,7 +73,9 @@ public class SecurityConfig {
                                 "/login",
                                 "/register",
                                 "/error",
-                                "/css/**", "/js/**", "/images/**"
+                                "/css/**", "/js/**", "/images/**",
+                                "/trainers"
+
                         ).permitAll()
 
                         // ✅ Swagger δημόσια (μόνο για να βλέπεις docs)
