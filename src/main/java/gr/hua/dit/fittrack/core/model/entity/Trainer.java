@@ -9,57 +9,55 @@ public class Trainer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String firstName; // Προσθήκη για την εκφώνηση
-    private String lastName;// Προσθήκη για την εκφώνηση
+    private String firstName;
+    private String lastName;
+
+    @Column(unique = true)
     private String email;
+
+    private String password; // Απαραίτητο για το login
+    private String role;     // Απαραίτητο για το Security Redirect (π.χ. ROLE_TRAINER)
+
     private String specialization;
     private String area;
 
+    // Default Constructor
     public Trainer() {}
 
-    public Trainer(String firstName, String lastName, String specialization, String area) {
+    // Constructor για εύκολη δημιουργία
+    public Trainer(String firstName, String lastName, String email, String password, String specialization, String area) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
+        this.password = password;
         this.specialization = specialization;
         this.area = area;
+        this.role = "ROLE_TRAINER"; // Default τιμή
     }
 
-    // Getters & Setters
-    public Long getId()
-    { return id; }
+    // --- Getters & Setters ---
 
-    public void setId(Long id)
-    { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getFirstName()
-    { return firstName; }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public void setFirstName(String firstName)
-    { this.firstName = firstName; }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
-    public String getLastName()
-    { return lastName; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setLastName(String lastName)
-    { this.lastName = lastName; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getSpecialization()
-    { return specialization; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public void setSpecialization(String specialization)
-    { this.specialization = specialization; }
+    public String getSpecialization() { return specialization; }
+    public void setSpecialization(String specialization) { this.specialization = specialization; }
 
-    public String getArea()
-    { return area; }
-
-    public void setArea(String area)
-    { this.area = area; }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getArea() { return area; }
+    public void setArea(String area) { this.area = area; }
 }
