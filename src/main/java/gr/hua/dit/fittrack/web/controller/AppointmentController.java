@@ -21,17 +21,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//@Controller
-@RequestMapping("/api/appointments")
+@Controller
+@RequestMapping("/appointments")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
     private final TrainerService trainerService;
     private final UserService userService;
+    private final TrainerRepository trainerRepository;
+
 
     public AppointmentController(final AppointmentService appointmentService,
                                  final TrainerService trainerService,
-                                 final UserService userService) {
+                                 final UserService userService,final TrainerRepository trainerRepository
+) {
         if (appointmentService == null) throw new NullPointerException();
         if (trainerService == null) throw new NullPointerException();
         if(userService == null) throw new NullPointerException();
@@ -39,42 +42,80 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
         this.trainerService = trainerService;
         this.userService = userService;
+        this.trainerRepository = trainerRepository;
     }
 
     // ------------------------
     // Προβολή φόρμας δημιουργίας (GET)
     // ------------------------
+//    @GetMapping("/create")
+//    public String showCreateForm(@RequestParam("trainerId") Long trainerId, Model model, Authentication authentication) {
+//        // 1. Βρίσκουμε τον συνδεδεμένο χρήστη από το email του
+//        String email = authentication.getName();
+//        User currentUser = userService.getUserByEmail(email)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        // 2. Βρίσκουμε τον Trainer για τον οποίο γίνεται η κράτηση
+//        Trainer trainer = trainerService.findTrainerById(trainerId)
+//                .orElseThrow(() -> new RuntimeException("Trainer not found"));
+//
+//        // 3. Αρχικοποιούμε το Request με τα ID του χρήστη και του trainer
+//        // Αυτό διασφαλίζει ότι τα hidden fields στη φόρμα θα έχουν τιμές
+//        CreateAppointmentRequest request = new CreateAppointmentRequest(
+//                currentUser.getId(),
+//                trainerId,
+//                null, // Το dateTime θα επιλεγεί από το dropdown
+//                AppointmentType.INDOOR,
+//                ""
+//        );
+//
+//        // 4. Φέρνουμε τα διαθέσιμα slots από το Service
+//        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(trainerId);
+//
+//        // 5. Προσθήκη στο Model για το Thymeleaf
+//        model.addAttribute("appointmentRequest", request);
+//        model.addAttribute("trainer", trainer);
+//        model.addAttribute("availableSlots", availableSlots);
+//
+//        return "create-appointment";
+//    }
+
     @GetMapping("/create")
-    public String showCreateForm(@RequestParam("trainerId") Long trainerId, Model model, Authentication authentication) {
-        // 1. Βρίσκουμε τον συνδεδεμένο χρήστη από το email του
+    public String showCreateForm(@RequestParam(value = "trainerId", required = false) Long trainerId,
+                                 Model model,
+                                 Authentication authentication) {
+
         String email = authentication.getName();
         User currentUser = userService.getUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 2. Βρίσκουμε τον Trainer για τον οποίο γίνεται η κράτηση
-        Trainer trainer = trainerService.findTrainerById(trainerId)
-                .orElseThrow(() -> new RuntimeException("Trainer not found"));
+        List<Trainer> trainers = trainerRepository.findAll();
 
-        // 3. Αρχικοποιούμε το Request με τα ID του χρήστη και του trainer
-        // Αυτό διασφαλίζει ότι τα hidden fields στη φόρμα θα έχουν τιμές
+        Trainer trainer = null;
+        List<LocalDateTime> availableSlots = List.of();
+
+        if (trainerId != null) {
+            trainer = trainerService.findTrainerById(trainerId)
+                    .orElseThrow(() -> new RuntimeException("Trainer not found"));
+            availableSlots = appointmentService.getAvailableSlots(trainerId);
+        }
+
         CreateAppointmentRequest request = new CreateAppointmentRequest(
                 currentUser.getId(),
                 trainerId,
-                null, // Το dateTime θα επιλεγεί από το dropdown
+                null,
                 AppointmentType.INDOOR,
                 ""
         );
 
-        // 4. Φέρνουμε τα διαθέσιμα slots από το Service
-        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(trainerId);
-
-        // 5. Προσθήκη στο Model για το Thymeleaf
         model.addAttribute("appointmentRequest", request);
+        model.addAttribute("trainers", trainers);
         model.addAttribute("trainer", trainer);
         model.addAttribute("availableSlots", availableSlots);
 
         return "create-appointment";
     }
+
 
     // ------------------------
     // Υποβολή φόρμας (POST)

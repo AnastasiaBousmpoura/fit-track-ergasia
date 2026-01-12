@@ -44,7 +44,24 @@
                     <form th:action="@{/appointments/create}" method="post">
 
                         <input type="hidden" name="userId" th:value="${appointmentRequest?.userId}">
-                        <input type="hidden" name="trainerId" th:value="${appointmentRequest?.trainerId}">
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Επίλεξε Trainer</label>
+                            <select class="form-select"
+                                    name="trainerId"
+                                    required
+                                    onchange="location = '/appointments/new?trainerId=' + this.value">
+                                <option value="" disabled
+                                        th:selected="${appointmentRequest.trainerId == null}">
+                                    -- Διάλεξε trainer --
+                                </option>
+
+                                <option th:each="t : ${trainers}"
+                                        th:value="${t.id}"
+                                        th:selected="${appointmentRequest.trainerId != null and appointmentRequest.trainerId == t.id}"
+                                        th:text="${t.firstName + ' ' + t.lastName + ' - ' + t.specialization}">
+                                </option>
+                            </select>
+                        </div>
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Διαθέσιμη Ώρα</label>

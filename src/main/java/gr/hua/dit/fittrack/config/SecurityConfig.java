@@ -65,6 +65,7 @@ public class SecurityConfig {
 
         http
                 .securityMatcher("/**")
+                .requestCache(cache -> cache.disable())
                 .authorizeHttpRequests(auth -> auth
                         // public
                         .requestMatchers(
@@ -85,20 +86,7 @@ public class SecurityConfig {
                         // everything else needs login
                         .anyRequest().authenticated()
                 )
-//                .formLogin(form -> form
-//                        .loginPage("/login")
-//                        .permitAll()
-//                        .successHandler((request, response, authentication) -> {
-//                            boolean isTrainer = authentication.getAuthorities().stream()
-//                                    .anyMatch(a -> a.getAuthority().equals("ROLE_TRAINER"));
-//
-//                            if (isTrainer) {
-//                                response.sendRedirect("/appointments/my-appointments"); // A
-//                            } else {
-//                                response.sendRedirect("/appointments/new"); // USER flow
-//                            }
-//                        })
-//                )
+
 
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -118,7 +106,7 @@ public class SecurityConfig {
                                 boolean isTrainer = authentication.getAuthorities().stream()
                                         .anyMatch(a -> a.getAuthority().equals("ROLE_TRAINER"));
 
-                                response.sendRedirect(isTrainer ? "/appointments/my-appointments" : "/appointments/new");
+                                response.sendRedirect(isTrainer ? "/appointments/my-appointments" : "/profile");
                                 return;
                             }
 
