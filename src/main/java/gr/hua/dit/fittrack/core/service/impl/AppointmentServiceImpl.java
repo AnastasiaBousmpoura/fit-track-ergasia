@@ -39,19 +39,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.trainerAvailabilityRepository = trainerAvailabilityRepository;
     }
 
-    // ---------------------------------------------------
-    // 1. Δημιουργία Ραντεβού (POST)
-    // ---------------------------------------------------
     @Override
     @Transactional
     public CreateAppointmentResult createAppointment(CreateAppointmentRequest req, boolean notify) {
-
-        // Έλεγχος αν η ημερομηνία είναι στο παρελθόν
         if (req.dateTime().isBefore(LocalDateTime.now())) {
             return CreateAppointmentResult.fail("Δεν επιτρέπονται ραντεβού στο παρελθόν.");
         }
 
-        // Έλεγχος αν ο trainer είναι διαθέσιμος βάσει του ωραρίου του (Availability)
+        // Προσοχή στο όνομα εδώ αν το Repository σου έχει Trainer_Id
         boolean hasAvailability = trainerAvailabilityRepository
                 .existsByTrainer_IdAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
                         req.trainerId(), req.dateTime(), req.dateTime()
@@ -61,13 +56,12 @@ public class AppointmentServiceImpl implements AppointmentService {
             return CreateAppointmentResult.fail("Ο trainer δεν είναι διαθέσιμος αυτή την ώρα.");
         }
 
-        // Έλεγχος αν ο trainer έχει ήδη άλλο ραντεβού εκείνη την ώρα (Busy)
-        boolean trainerBusy = appointmentRepository.existsByTrainer_IdAndDateTime(req.trainerId(), req.dateTime());
+        // Χρησιμοποιούμε τη νέα μέθοδο findByTrainerId
+        boolean trainerBusy = appointmentRepository.existsByTrainerIdAndDateTime(req.trainerId(), req.dateTime());
         if (trainerBusy) {
             return CreateAppointmentResult.fail("Υπάρχει ήδη ραντεβού του trainer την ίδια ώρα.");
         }
 
-        // Φόρτωση User & Trainer
         User user = userRepository.findById(req.userId()).orElse(null);
         Trainer trainer = trainerRepository.findById(req.trainerId()).orElse(null);
 
@@ -75,21 +69,29 @@ public class AppointmentServiceImpl implements AppointmentService {
             return CreateAppointmentResult.fail("Δεν βρέθηκε ο χρήστης ή ο trainer.");
         }
 
-        // Δημιουργία και Αποθήκευση
         Appointment appt = new Appointment();
         appt.setUser(user);
         appt.setTrainer(trainer);
         appt.setDateTime(req.dateTime());
         appt.setType(req.type());
+        appt.setStatus("PENDING");
         appt.setNotes(req.notes());
 
         Appointment saved = appointmentRepository.save(appt);
         return CreateAppointmentResult.success(saved);
     }
 
-    // ---------------------------------------------------
-    // 2. Διαγραφή Ραντεβού
-    // ---------------------------------------------------
+    @Override
+    public Appointment findById(Long id) {
+        return appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Το ραντεβού δεν βρέθηκε."));
+    }
+
+    @Override
+    public List<Appointment> getAppointmentsForTrainer(String email) {
+        return appointmentRepository.findByTrainer_Email(email);
+    }
+
     @Override
     @Transactional
     public void deleteAppointment(Long id) {
@@ -99,25 +101,32 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentRepository.deleteById(id);
     }
 
-    // ---------------------------------------------------
-    // 3. Λήψη Διαθέσιμων Slots (GET για το Dropdown)
-    // ---------------------------------------------------
+    @Override
+    @Transactional
+    public void updateStatus(Long id, String status) {
+        Appointment app = findById(id);
+        app.setStatus(status);
+        appointmentRepository.save(app);
+    }
+
+    @Override
+    @Transactional
+    public void updateNotes(Long id, String notes) {
+        Appointment app = findById(id);
+        app.setNotes(notes);
+        appointmentRepository.save(app);
+    }
+
     @Override
     public List<LocalDateTime> getAvailableSlots(Long trainerId) {
         List<LocalDateTime> slots = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
 
-        // α) Φέρνουμε τα ωράρια του trainer από τη βάση
         List<TrainerAvailability> availabilityList = trainerAvailabilityRepository.findByTrainer_Id(trainerId);
 
         for (TrainerAvailability av : availabilityList) {
-            LocalDateTime start = av.getStartTime();
-            LocalDateTime end = av.getEndTime();
-
-            // Παράγουμε slots ανά 1 ώρα
-            LocalDateTime tempSlot = start;
-            while (tempSlot.isBefore(end)) {
-                // Προσθέτουμε μόνο αν η ώρα είναι μελλοντική
+            LocalDateTime tempSlot = av.getStartTime();
+            while (tempSlot.isBefore(av.getEndTime())) {
                 if (tempSlot.isAfter(now)) {
                     slots.add(tempSlot);
                 }
@@ -125,19 +134,14 @@ public class AppointmentServiceImpl implements AppointmentService {
             }
         }
 
-        // β) Φέρνουμε τα ήδη κλεισμένα ραντεβού του trainer
-        List<LocalDateTime> bookedTimes = appointmentRepository.findByTrainer_Id(trainerId)
+        // Χρησιμοποιούμε τη νέα μέθοδο findByTrainerId
+        List<LocalDateTime> bookedTimes = appointmentRepository.findByTrainerId(trainerId)
                 .stream()
                 .map(Appointment::getDateTime)
                 .toList();
 
-        // γ) Αφαιρούμε τα κλεισμένα από τη λίστα των slots
         slots.removeAll(bookedTimes);
-
-        // δ) Επιστροφή ταξινομημένης λίστας
-        return slots.stream()
-                .sorted()
-                .collect(Collectors.toList());
+        return slots.stream().sorted().collect(Collectors.toList());
     }
 
     @Override
@@ -152,5 +156,15 @@ public class AppointmentServiceImpl implements AppointmentService {
         availability.setEndTime(end);
 
         trainerAvailabilityRepository.save(availability);
+    }
+
+    @Override
+    public List<Appointment> getAppointmentsByTrainer(String trainerEmail) {
+        return appointmentRepository.findByTrainer_Email(trainerEmail);
+    }
+
+    @Override
+    public List<Appointment> getAppointmentsByUser(String userEmail) {
+        return appointmentRepository.findByUser_EmailAddress(userEmail);
     }
 }

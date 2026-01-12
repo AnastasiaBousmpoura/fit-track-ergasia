@@ -1,15 +1,20 @@
 package gr.hua.dit.fittrack.web.controller;
 
+import gr.hua.dit.fittrack.core.model.entity.Appointment;
+import gr.hua.dit.fittrack.core.model.entity.Trainer;
+import gr.hua.dit.fittrack.core.repository.TrainerRepository;
 import gr.hua.dit.fittrack.core.service.AppointmentService;
 import gr.hua.dit.fittrack.core.service.TrainerService;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentRequest;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentResult;
-import gr.hua.dit.fittrack.core.repository.TrainerRepository;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/appointments")
@@ -17,43 +22,35 @@ public class AppointmentViewController {
 
     private final AppointmentService appointmentService;
     private final TrainerService trainerService;
+    private final TrainerRepository trainerRepository; // Προσθήκη
 
     public AppointmentViewController(
             final AppointmentService appointmentService,
-            final TrainerService trainerService) {
-        if (appointmentService == null) throw new NullPointerException();
-        if (trainerService == null) throw new NullPointerException();
-
+            final TrainerService trainerService,
+            final TrainerRepository trainerRepository) {
         this.appointmentService = appointmentService;
         this.trainerService = trainerService;
+        this.trainerRepository = trainerRepository;
     }
 
-    // 1. Εμφάνιση φόρμας νέου ραντεβού
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        // Χρησιμοποιούμε τον νέο constructor με default τιμές
         model.addAttribute("appointmentRequest", new CreateAppointmentRequest());
-
-        // Φέρνουμε τους trainers για το dropdown list
         model.addAttribute("trainers", trainerService.findAllTrainers());
-
-        return "appointment-booking"; // HTML στο templates/appointment-booking.html
+        return "appointment-booking";
     }
 
-    // 2. Χειρισμός υποβολής φόρμας
     @PostMapping("/new")
     public String processAppointment(
             @Valid @ModelAttribute("appointmentRequest") CreateAppointmentRequest request,
             BindingResult bindingResult,
             Model model
     ) {
-        // Α) Έλεγχος validation
         if (bindingResult.hasErrors()) {
             model.addAttribute("trainers", trainerService.findAllTrainers());
             return "appointment-booking";
         }
 
-        // Β) Εκτέλεση λογικής δημιουργίας ραντεβού
         CreateAppointmentResult result = appointmentService.createAppointment(request, true);
 
         if (!result.created()) {
@@ -62,15 +59,52 @@ public class AppointmentViewController {
             return "appointment-booking";
         }
 
-        // Γ) Επιτυχία - Redirect στη λίστα των ραντεβού
         return "redirect:/appointments/my-appointments?success";
     }
 
-    // 3. Προβολή λίστας ραντεβού χρήστη
+    // Η ΜΕΓΑΛΗ ΑΛΛΑΓΗ ΕΔΩ
     @GetMapping("/my-appointments")
-    public String listAppointments(Model model) {
-        // Αν θέλεις μπορείς να φορτώσεις τα ραντεβού του χρήστη εδώ
-        // model.addAttribute("appointments", appointmentService.getUserAppointments(userId));
-        return "appointment-list"; // HTML στο templates/appointment-list.html
+    public String listAppointments(Authentication authentication, Model model) {
+        String email = authentication.getName();
+
+        // Ελέγχουμε αν ο χρήστης έχει ρόλο TRAINER
+        boolean isTrainer = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_TRAINER"));
+
+        if (isTrainer) {
+            // 1. Φέρνουμε τα ραντεβού που αφορούν τον Trainer
+            List<Appointment> trainerApps = appointmentService.getAppointmentsByTrainer(email);
+            model.addAttribute("appointments", trainerApps);
+
+            // 2. Φέρνουμε τα στοιχεία του Trainer για το header (όνομα κλπ)
+            Trainer trainer = trainerRepository.findByEmail(email).orElse(null);
+            model.addAttribute("trainer", trainer);
+
+            // 3. ΕΠΙΣΤΡΕΦΟΥΜΕ ΤΟ ΣΩΣΤΟ HTML (Αυτό με το "+ Ορισμός Ωραρίου")
+            return "trainer-availability";
+        }
+
+        // Αλλιώς (αν είναι USER), επιστρέφουμε την κλασική λίστα
+        model.addAttribute("appointments", appointmentService.getAppointmentsByUser(email));
+        return "appointment-list";
+    }
+
+    @PostMapping("/update-status") // Διόρθωση path (αφαιρέθηκε το διπλό /appointments)
+    public String updateAppointmentStatus(@RequestParam Long id, @RequestParam String status) {
+        appointmentService.updateStatus(id, status);
+        return "redirect:/appointments/my-appointments?statusUpdated";
+    }
+
+    @GetMapping("/notes/{id}") // Διόρθωση path
+    public String showNotesPage(@PathVariable Long id, Model model) {
+        Appointment app = appointmentService.findById(id);
+        model.addAttribute("appointment", app);
+        return "appointments-notes";
+    }
+
+    @PostMapping("/notes/save") // Διόρθωση path
+    public String saveAppointmentNotes(@RequestParam Long id, @RequestParam String notes) {
+        appointmentService.updateNotes(id, notes);
+        return "redirect:/appointments/my-appointments?notesSaved";
     }
 }

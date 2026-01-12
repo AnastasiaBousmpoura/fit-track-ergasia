@@ -2,32 +2,60 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Διαθεσιμότητα Trainer</title>
+    <title>FitTrack - Πρόγραμμα Trainer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-light">
 
-<h2>
-    Διαθεσιμότητα –
-    <span th:text="${trainer.firstName + ' ' + trainer.lastName}"></span>
-</h2>
+<div class="container py-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">Το Πρόγραμμα των Προπονήσεών μου</h3>
+                <a th:href="@{/trainer/availability}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Ορισμός Ωραρίου
+                </a>
+            </div>
 
-<div th:if="${#lists.isEmpty(slots)}">
-    Δεν υπάρχουν διαθέσιμες ώρες.
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Ημερομηνία</th>
+                        <th>Ώρα</th>
+                        <th>Πελάτης</th>
+                        <th>Κατηγορία</th>
+                        <th>Κατάσταση</th>
+                        <th>Ενέργειες</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="app : ${appointments}">
+                        <td th:text="${#temporals.format(app.dateTime, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#temporals.format(app.dateTime, 'HH:mm')}"></td>
+                        <td th:text="${app.user.firstName + ' ' + app.user.lastName}"></td>
+                        <td th:text="${app.category}"></td>
+                        <td>
+                                <span th:classappend="${app.status == 'ACCEPTED' ? 'badge bg-success' : (app.status == 'CANCELLED' ? 'badge bg-danger' : 'badge bg-warning')}"
+                                      th:text="${app.status}">
+                                </span>
+                        </td>
+                        <td>
+                            <a th:href="@{/appointments/edit/{id}(id=${app.id})}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(appointments)}">
+                        <td colspan="6" class="text-center text-muted py-4">Δεν υπάρχουν προγραμματισμένα ραντεβού.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-
-<ul>
-    <li th:each="slot : ${slots}">
-        <span>
-            <b th:text="${#temporals.format(slot.startTime, 'dd/MM/yyyy HH:mm')}"></b>
-            –
-            <b th:text="${#temporals.format(slot.endTime, 'HH:mm')}"></b>
-        </span>
-
-        <button disabled>
-            Κλείσε (αργότερα)
-        </button>
-    </li>
-</ul>
 
 </body>
 </html>

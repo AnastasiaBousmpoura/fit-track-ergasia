@@ -1,5 +1,6 @@
 package gr.hua.dit.fittrack.core.service;
 
+import gr.hua.dit.fittrack.core.model.entity.Appointment;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentRequest;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAppointmentResult;
 
@@ -11,7 +12,6 @@ public interface AppointmentService {
     // Δημιουργία ραντεβού
     CreateAppointmentResult createAppointment(CreateAppointmentRequest req, boolean notify);
 
-    // Υπέρβαση με default για πιο απλή χρήση
     default CreateAppointmentResult createAppointment(CreateAppointmentRequest req) {
         return createAppointment(req, false);
     }
@@ -19,9 +19,22 @@ public interface AppointmentService {
     // Διαγραφή ραντεβού
     void deleteAppointment(Long id);
 
-    // Λίστα διαθέσιμων slots για trainer
+    // Εύρεση συγκεκριμένου ραντεβού (για τη σελίδα σημειώσεων)
+    Appointment findById(Long id);
+
+    // Λίστα ραντεβού για Trainer βάσει email
+    List<Appointment> getAppointmentsForTrainer(String email);
+
+    List<Appointment> getAppointmentsByTrainer(String trainerEmail);
+    List<Appointment> getAppointmentsByUser(String userEmail); // Πρόσθεσε και αυτήν αν λείπει
+
+    // ✅ Λειτουργία: Αποδοχή/Ακύρωση ραντεβού
+    void updateStatus(Long id, String status);
+
+    // ✅ Λειτουργία: Καταγραφή σημειώσεων/πλάνου προπόνησης
+    void updateNotes(Long id, String notes);
+
+    // Διαχείριση διαθεσιμότητας
     List<LocalDateTime> getAvailableSlots(Long trainerId);
-
     void setTrainerAvailability(Long trainerId, LocalDateTime start, LocalDateTime end);
-
 }

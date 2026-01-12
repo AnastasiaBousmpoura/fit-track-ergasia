@@ -24,14 +24,16 @@ public class Appointment {
 
     private String type; // π.χ. "Yoga", "Crossfit", "Personal"
 
-    @Column(length = 255)
-    private String notes;
-
     @Column(length = 80)
     private String location;
 
     @Column(length = 255)
     private String weatherSummary;
+
+    private String status = "PENDING"; // Default τιμή για τα νέα ραντεβού
+
+    @Column(length = 2000) // Μεγάλο μήκος για να χωράει το πλάνο
+    private String notes;
 
     // Constructors
     public Appointment() {
@@ -71,4 +73,7 @@ public class Appointment {
 
     public String getWeatherSummary() { return weatherSummary; }
     public void setWeatherSummary(String weatherSummary) { this.weatherSummary = weatherSummary; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

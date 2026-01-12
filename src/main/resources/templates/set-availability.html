@@ -10,20 +10,27 @@
     <div class="card shadow mx-auto" style="max-width: 500px;">
         <div class="card-body">
             <h3 class="text-center mb-4">Ορισμός Ωραρίου Εργασίας</h3>
-            <form th:action="@{/trainer/availability/set}" method="post">
-                <input type="hidden" name="trainerId" th:value="${currentTrainerId}">
 
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+            <form th:action="@{/trainer/availability/set}" method="post">
                 <div class="mb-3">
                     <label class="form-label">Έναρξη Βάρδιας</label>
                     <input type="datetime-local" name="start" class="form-control" required>
+                    <div class="form-text">Επιλέξτε την ημέρα και την ώρα που ξεκινάτε.</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Λήξη Βάρδιας</label>
                     <input type="datetime-local" name="end" class="form-control" required>
+                    <div class="form-text">Επιλέξτε την ώρα που τελειώνετε.</div>
                 </div>
 
-                <button type="submit" class="btn btn-success w-100">Αποθήκευση Διαθεσιμότητας</button>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success">Αποθήκευση Διαθεσιμότητας</button>
+                    <a th:href="@{/appointments/my-appointments}" class="btn btn-outline-secondary">Επιστροφή στο Πρόγραμμα</a>
+                </div>
             </form>
         </div>
     </div>
