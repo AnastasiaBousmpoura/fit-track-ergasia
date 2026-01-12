@@ -1,0 +1,6 @@
+#FileLock
+#Mon Jan 12 15:48:04 UTC 2026
+hostName=dimitra
+id=19bb2e499b371eb012e34cbc09d5617510617f9c755
+method=file
+server=127.0.1.1\:44945
