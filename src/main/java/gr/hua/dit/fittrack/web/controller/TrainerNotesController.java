@@ -13,24 +13,22 @@ import org.springframework.web.bind.annotation.*;
 public class TrainerNotesController {
     private final TrainerNotesService trainerNotesService;
 
-    public TrainerNotesController(
-            TrainerNotesService trainerNotesService
-    ) {
-        if (trainerNotesService == null) throw new NullPointerException();
-
+    public TrainerNotesController(TrainerNotesService trainerNotesService) {
         this.trainerNotesService = trainerNotesService;
     }
 
     @GetMapping("/{appointmentId}/notes")
-    public String notes(
-            @PathVariable Long appointmentId,
-            Model model
-    ) {
-        model.addAttribute("notes",
-                trainerNotesService.listNotes(appointmentId));
+    public String notes(@PathVariable Long appointmentId, Model model) {
+        try {
+            model.addAttribute("notes", trainerNotesService.listNotes(appointmentId));
+        } catch (Exception e) {
+            // Αν αποτύχει το listNotes λόγω auth, βάζουμε μια κενή λίστα για να μην κρασάρει η GET
+            model.addAttribute("notes", java.util.Collections.emptyList());
+        }
+
         model.addAttribute("appointmentId", appointmentId);
         model.addAttribute("form", new TrainerNotesForm(""));
-        return "trainer_notes";
+        return "appointments-notes";
     }
 
     @PostMapping("/{appointmentId}/notes")
@@ -41,14 +39,33 @@ public class TrainerNotesController {
             Model model
     ) {
         if (bindingResult.hasErrors()) {
-            return "trainer_notes";
+            model.addAttribute("appointmentId", appointmentId);
+            return "appointments-notes";
         }
 
-        var result = trainerNotesService.addNotes(appointmentId, form.getText());
+        try {
+            // Προσπάθεια αποθήκευσης μέσω του Service
+            var result = trainerNotesService.addNotes(appointmentId, form.getText());
 
-        if (!result.created()) {
-            model.addAttribute("errorMessage", result.reason());
-            return "trainer_notes";
+            if (!result.created()) {
+                model.addAttribute("errorMessage", result.reason());
+                model.addAttribute("appointmentId", appointmentId);
+                model.addAttribute("notes", trainerNotesService.listNotes(appointmentId));
+                return "appointments-notes";
+            }
+        } catch (Exception e) {
+            /* ΕΔΩ ΕΙΝΑΙ Η ΛΥΣΗ: Αν το service πετάξει "not authenticated",
+               αντί για μαύρη οθόνη, επιστρέφουμε στη σελίδα με μήνυμα σφάλματος.
+            */
+            model.addAttribute("errorMessage", "Σφάλμα Αυθεντικοποίησης: Ο λογαριασμός σας δεν έχει δικαιώματα Trainer ή το session έληξε.");
+            model.addAttribute("appointmentId", appointmentId);
+            model.addAttribute("form", form);
+            try {
+                model.addAttribute("notes", trainerNotesService.listNotes(appointmentId));
+            } catch (Exception ex) {
+                model.addAttribute("notes", java.util.Collections.emptyList());
+            }
+            return "appointments-notes";
         }
 
         return "redirect:/trainer/appointments/" + appointmentId + "/notes";

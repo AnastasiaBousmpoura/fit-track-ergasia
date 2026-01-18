@@ -73,6 +73,8 @@ public class SecurityConfig {
                                 "/",
                                 "/login",
                                 "/register",
+                                "/about",          // ΠΡΟΣΘΗΚΗ: Η νέα σελίδα οδηγιών
+                                "/about/**",       // ΠΡΟΣΘΗΚΗ: Για τυχόν υποσελίδες
                                 "/error",
                                 "/css/**", "/js/**", "/images/**",
                                 "/trainers",

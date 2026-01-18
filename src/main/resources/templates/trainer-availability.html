@@ -1,86 +1,128 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>FitTrack - Πρόγραμμα Trainer</title>
+    <title>FitTrack - Διαχείριση Trainer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-light">
+<div class="container py-5">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/}">
-            <i class="fas fa-dumbbell"></i> FitTrack
-        </a>
-        <div class="ms-auto d-flex align-items-center">
-            <span class="text-light me-3" sec:authentication="name">Username</span>
-            <form th:action="@{/logout}" method="post" class="m-0">
-                <button type="submit" class="btn btn-outline-danger btn-sm">Αποσύνδεση</button>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h4 mb-0">Διαχείριση Προγράμματος & Ραντεβού</h2>
+            <p class="text-muted small mb-0">Καλώς ήρθατε στο πάνελ διαχείρισης προπονητή</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-home me-1"></i> Αρχική
+            </a>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fas fa-sign-out-alt me-1"></i> Αποσύνδεση
+                </button>
             </form>
         </div>
     </div>
-</nav>
 
-<div class="container">
-    <div class="mb-3">
-        <a th:href="@{/}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Αρχική Σελίδα
-        </a>
-    </div>
-
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="mb-0">Το Πρόγραμμα των Προπονήσεών μου</h3>
-                <a th:href="@{/trainer/availability}" class="btn btn-success">
-                    <i class="fas fa-plus"></i> Ορισμός Ωραρίου
-                </a>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-success text-white fw-bold">
+                    <i class="fas fa-calendar-plus me-2"></i>Προσθήκη Ημέρας
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/trainer/availability/save}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Επιλέξτε Ημερομηνία</label>
+                            <input type="date" name="availableDate" class="form-control" required
+                                   th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 shadow-sm">Αποθήκευση</button>
+                    </form>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Ημερομηνία</th>
-                        <th>Ώρα</th>
-                        <th>Πελάτης</th>
-                        <th>Κατηγορία</th>
-                        <th>Κατάσταση</th>
-                        <th>Ενέργειες</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="app : ${appointments}">
-                        <td th:text="${#temporals.format(app.dateTime, 'dd/MM/yyyy')}"></td>
-                        <td th:text="${#temporals.format(app.dateTime, 'HH:mm')}"></td>
-                        <!--<td th:text="${app.user.firstName + ' ' + app.user.lastName}"></td>-->
-                        <td th:text="${app.user.emailAddress}"></td>
-                        <td th:text="${app.type}"></td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${app.status == 'ACCEPTED' ? 'bg-success' : (app.status == 'CANCELLED' ? 'bg-danger' : 'bg-warning')}"
-                                  th:text="${app.status}">
-                            </span>
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <a th:href="@{/appointments/notes/{id}(id=${app.id})}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form th:if="${app.status != 'CANCELLED'}" th:action="@{/appointments/cancel/{id}(id=${app.id})}" method="post">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Ακύρωση ραντεβού;')">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(appointments)}">
-                        <td colspan="6" class="text-center text-muted py-4">Δεν υπάρχουν προγραμματισμένα ραντεβού.</td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white fw-bold small text-muted">ΕΝΕΡΓΕΣ ΗΜΕΡΕΣ ΣΤΟ ΠΡΟΓΡΑΜΜΑ</div>
+                <div class="list-group list-group-flush">
+                    <div th:if="${#lists.isEmpty(availabilities)}" class="list-group-item text-center py-3 text-muted small">
+                        Δεν έχετε δηλώσει διαθεσιμότητα.
+                    </div>
+                    <div th:each="avail : ${availabilities}" class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="far fa-calendar-alt text-success me-2"></i>
+                            <span th:text="${#temporals.format(avail.availableDate, 'dd/MM/yyyy')}"></span>
+                        </div>
+                        <form th:action="@{/trainer/availability/delete/{id}(id=${avail.id})}" method="post">
+                            <button type="submit" class="btn btn-sm text-danger border-0" onclick="return confirm('Διαγραφή ημέρας;')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="fas fa-clock me-2"></i>Προγραμματισμένες Προπονήσεις
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th class="small text-muted">ΩΡΑ</th>
+                            <th class="small text-muted">ΠΕΛΑΤΗΣ</th>
+                            <th class="small text-muted">ΤΥΠΟΣ</th>
+                            <th class="small text-muted text-end">ΕΝΕΡΓΕΙΕΣ</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(appointments)}">
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                Δεν υπάρχουν κρατήσεις για τις διαθέσιμες ημέρες σας.
+                            </td>
+                        </tr>
+                        <tr th:each="app : ${appointments}">
+                            <td class="fw-bold" th:text="${#temporals.format(app.dateTime, 'dd/MM HH:mm')}"></td>
+
+                            <td>
+                                <div th:text="${app.user.userFirstName + ' ' + app.user.userLastName}"></div>
+                                <div class="small text-muted" th:text="${app.user.emailAddress}"></div>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-info text-dark" th:text="${app.type}"></span>
+                            </td>
+
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a th:if="${app.status == null or app.status.name() != 'CANCELLED'}"
+                                       th:href="@{/trainer/appointments/{id}/notes(id=${app.id})}"
+                                       class="btn btn-sm btn-outline-dark">
+                                        <i class="fas fa-edit me-1"></i>Πλάνο
+                                    </a>
+
+                                    <div th:if="${app.status != null && app.status.name() == 'CANCELLED'}">
+                                        <span class="badge bg-danger">ΑΚΥΡΩΘΗΚΕ</span>
+                                    </div>
+                                    <form th:if="${app.status == null or app.status.name() != 'CANCELLED'}"
+                                          th:action="@{/appointments/view/cancel/{id}(id=${app.id})}"
+                                          method="post">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('Θέλετε να ακυρώσετε αυτή την προπόνηση;')">
+                                            Ακύρωση
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

@@ -8,7 +8,7 @@ import gr.hua.dit.fittrack.core.service.AvailabilityService;
 import gr.hua.dit.fittrack.core.service.impl.dto.CreateAvailabilityResult;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,13 +17,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     private final TrainerAvailabilityRepository availabilityRepository;
     private final TrainerRepository trainerRepository;
 
-    public AvailabilityServiceImpl(
-            final TrainerAvailabilityRepository availabilityRepository,
-            final TrainerRepository trainerRepository
-    ) {
-        if (availabilityRepository == null) throw new NullPointerException();
-        if (trainerRepository == null) throw new NullPointerException();
-
+    public AvailabilityServiceImpl(TrainerAvailabilityRepository availabilityRepository, TrainerRepository trainerRepository) {
         this.availabilityRepository = availabilityRepository;
         this.trainerRepository = trainerRepository;
     }
@@ -31,35 +25,20 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     @Transactional
     @Override
     public CreateAvailabilityResult createSlot(Long trainerId, LocalDateTime start, LocalDateTime end) {
-        // Έλεγχος εισόδου
-        if (start == null || end == null || !start.isBefore(end)) {
-            return CreateAvailabilityResult.fail("Invalid start or end time");
-        }
+        LocalDate date = start.toLocalDate();
+        if (date.isBefore(LocalDate.now())) return CreateAvailabilityResult.fail("Invalid date");
 
         Trainer trainer = trainerRepository.findById(trainerId).orElse(null);
-        if (trainer == null) {
-            return CreateAvailabilityResult.fail("Trainer not found");
+        if (trainer == null) return CreateAvailabilityResult.fail("Trainer not found");
+
+        if (availabilityRepository.existsByTrainer_IdAndAvailableDate(trainerId, date)) {
+            return CreateAvailabilityResult.fail("Availability already set for this date");
         }
 
-        // Έλεγχος overlap
-        List<TrainerAvailability> existingSlots = availabilityRepository.findByTrainer_Id(trainerId);
-        boolean overlaps = existingSlots.stream().anyMatch(slot ->
-                start.isBefore(slot.getEndTime()) && end.isAfter(slot.getStartTime())
-        );
-
-        if (overlaps) {
-            return CreateAvailabilityResult.fail("Slot overlaps with existing availability");
-        }
-
-        // Δημιουργία slot
         TrainerAvailability slot = new TrainerAvailability();
         slot.setTrainer(trainer);
-        slot.setStartTime(start);
-        slot.setEndTime(end);
-
-        slot = availabilityRepository.save(slot);
-
-        return CreateAvailabilityResult.success(slot);
+        slot.setAvailableDate(date);
+        return CreateAvailabilityResult.success(availabilityRepository.save(slot));
     }
 
     @Override
@@ -70,11 +49,8 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     @Transactional
     @Override
     public void deleteSlot(Long trainerId, Long slotId) {
-        TrainerAvailability slot = availabilityRepository.findById(slotId).orElse(null);
-        if (slot == null) return; // δεν υπάρχει, απλά φεύγουμε
-        if (!slot.getTrainer().getId().equals(trainerId)) {
-            throw new RuntimeException("Trainer cannot delete this slot");
-        }
-        availabilityRepository.delete(slot);
+        availabilityRepository.findById(slotId).ifPresent(slot -> {
+            if (slot.getTrainer().getId().equals(trainerId)) availabilityRepository.delete(slot);
+        });
     }
 }

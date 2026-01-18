@@ -1,83 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>FitTrack - Booking Service</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-light">
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-6">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a th:href="@{/}" class="btn btn-sm btn-outline-secondary shadow-sm">
+                    <i class="fas fa-home me-1"></i> Αρχική
+                </a>
+                <a th:href="@{/profile}" class="btn btn-sm btn-outline-primary shadow-sm">
+                    <i class="fas fa-user-circle me-1"></i> Το Προφίλ μου
+                </a>
+            </div>
+
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-dark text-white py-3">
-                    <h5 class="card-title mb-0 text-center text-uppercase">Προγραμματισμός Νέας Προπόνησης</h5>
+                <div class="card-header bg-dark text-white py-3 text-center">
+                    <h5 class="mb-0 text-uppercase">Προγραμματισμός Νέας Προπόνησης</h5>
                 </div>
                 <div class="card-body p-4">
 
-                    <div th:if="${errorMessage}" class="alert alert-warning border-0 shadow-sm" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <span th:text="${errorMessage}"></span>
-                    </div>
+                    <div th:if="${errorMessage}" class="alert alert-warning border-0 shadow-sm" th:text="${errorMessage}"></div>
 
                     <form th:action="@{/appointments/new}" th:object="${appointmentRequest}" method="post">
 
-
-                    <div class="mb-4">
-                            <label for="trainerSelect" class="form-label fw-bold">Επιλέξτε Personal Trainer</label>
-                            <select id="trainerSelect" th:field="*{trainerId}" class="form-select form-select-lg" required>
-                                <option value="" selected disabled>Επιλέξτε από τη λίστα...</option>
-                                <option th:each="trainer : ${trainers}"
-                                        th:value="${trainer.id}"
-                                        th:text="${'Coach ' + trainer.firstName + ' ' + trainer.lastName}"></option>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Επιλέξτε Personal Trainer</label>
+                            <select id="trainerSelect" name="trainerId" class="form-select form-select-lg" required
+                                    onchange="window.location.href='/appointments/new?trainerId=' + this.value">
+                                <option value="" th:selected="${appointmentRequest.trainerId == null}">--- Επιλέξτε από τη λίστα ---</option>
+                                <option th:each="t : ${trainers}"
+                                        th:value="${t.id}"
+                                        th:text="${'Coach ' + t.firstName + ' ' + t.lastName}"
+                                        th:selected="${t.id == appointmentRequest.trainerId}"></option>
                             </select>
                         </div>
 
                         <div class="mb-4">
-                            <label for="dateTimeInput" class="form-label fw-bold">Επιθυμητή Ημερομηνία & Ώρα</label>
-                            <input type="datetime-local" id="dateTimeInput" th:field="*{dateTime}"
-                                   class="form-control form-control-lg" required>
-                            <div class="form-text text-danger" th:if="${#fields.hasErrors('dateTime')}" th:errors="*{dateTime}"></div>
+                            <label class="form-label fw-bold">Διαθέσιμες Ώρες Προπόνησης</label>
+                            <select th:field="*{dateTime}" class="form-select form-select-lg" required>
+                                <option value="" selected disabled>--- Επιλέξτε Slot ---</option>
+                                <option th:each="slot : ${availableSlots}"
+                                        th:value="${slot}"
+                                        th:text="${#temporals.format(slot, 'dd/MM/yyyy - HH:mm')}"></option>
+                            </select>
+                            <div class="form-text text-muted small mt-2" th:if="${#lists.isEmpty(availableSlots) and appointmentRequest.trainerId != null}">
+                                Δεν βρέθηκαν διαθέσιμες ώρες. Βεβαιωθείτε ότι επιλέξατε Trainer με ενεργό πρόγραμμα.
+                            </div>
                         </div>
 
                         <div class="mb-4">
-                            <label for="typeSelect" class="form-label fw-bold">Είδος Προπόνησης</label>
-                            <select id="typeSelect" th:field="*{type}" class="form-select form-select-lg" required>
-                                <option value="" selected disabled>Επιλέξτε...</option>
+                            <label class="form-label fw-bold">Είδος Προπόνησης</label>
+                            <select th:field="*{type}" class="form-select form-select-lg">
                                 <option value="INDOOR">INDOOR</option>
                                 <option value="OUTDOOR">OUTDOOR</option>
                             </select>
-                            <div class="form-text text-danger" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
                         </div>
 
                         <div class="mb-4">
-                            <label for="notesInput" class="form-label fw-bold">Σημειώσεις για τον Trainer</label>
-                            <textarea id="notesInput"
-                                      th:field="*{notes}"
-                                      class="form-control form-control-lg"
-                                      rows="3"
-                                      placeholder="Π.χ. στόχος, τραυματισμοί, τι να προσέξει ο trainer..."></textarea>
-                            <div class="form-text text-danger"
-                                 th:if="${#fields.hasErrors('notes')}"
-                                 th:errors="*{notes}"></div>
+                            <label class="form-label fw-bold">Σημειώσεις</label>
+                            <textarea th:field="*{notes}" class="form-control" rows="3" placeholder="Προαιρετικά σχόλια..."></textarea>
                         </div>
 
-
-                        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger">
-                            <ul>
-                                <li th:each="e : ${#fields.errors('*')}" th:text="${e}"></li>
-                            </ul>
-                        </div>
-
-
-                        <div class="d-grid gap-2 mt-5">
-                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">Οριστικοποίηση Ραντεβού</button>
-                            <a th:href="@{/appointments/my-appointments}" class="btn btn-outline-secondary">Επιστροφή στο Προφίλ</a>
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="fas fa-check-circle me-1"></i> Οριστικοποίηση Ραντεβού
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
+
+            <p class="text-center mt-4 text-muted small">
+                FitTrack &copy; 2026 - Η υγεία σας σε προτεραιότητα.
+            </p>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

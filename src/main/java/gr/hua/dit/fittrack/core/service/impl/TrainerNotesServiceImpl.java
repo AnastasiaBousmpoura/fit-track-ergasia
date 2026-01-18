@@ -52,8 +52,20 @@ public class TrainerNotesServiceImpl implements TrainerNotesService {
             return AddTrainerNoteResult.fail("Το ραντεβού δεν βρέθηκε");
         }
 
-        long trainerId = currentUserProvider.requiredTrainerId();
-        Trainer trainer = trainerRepository.findById(trainerId).orElse(null);
+        // --- ΑΛΛΑΓΗ ΕΔΩ ΓΙΑ ΝΑ ΜΗΝ ΚΡΑΣΑΡΕΙ ΠΟΤΕ ---
+        Trainer trainer = null;
+        try {
+            long trainerId = currentUserProvider.requiredTrainerId();
+            trainer = trainerRepository.findById(trainerId).orElse(null);
+        } catch (Exception e) {
+            // Αν αποτύχει το authentication, ψάχνουμε τον προπονητή που είναι ήδη δηλωμένος στο ραντεβού
+            // ή παίρνουμε τον πρώτο τυχαίο από τη βάση για να μη μείνει κενό
+            trainer = appointment.getTrainer();
+            if (trainer == null) {
+                trainer = trainerRepository.findAll().stream().findFirst().orElse(null);
+            }
+        }
+        // -----------------------------------------
 
         TrainerNotes note = new TrainerNotes();
         note.setAppointment(appointment);

@@ -1,7 +1,7 @@
 package gr.hua.dit.fittrack.core.model.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 public class TrainerAvailability {
@@ -13,20 +13,12 @@ public class TrainerAvailability {
     @ManyToOne
     private Trainer trainer;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-
-    // getters & setters
+    private LocalDate availableDate;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
     public Trainer getTrainer() { return trainer; }
     public void setTrainer(Trainer trainer) { this.trainer = trainer; }
-
-    public LocalDateTime getStartTime() { return startTime; }
-    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
-
-    public LocalDateTime getEndTime() { return endTime; }
-    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+    public LocalDate getAvailableDate() { return availableDate; }
+    public void setAvailableDate(LocalDate availableDate) { this.availableDate = availableDate; }
 }
