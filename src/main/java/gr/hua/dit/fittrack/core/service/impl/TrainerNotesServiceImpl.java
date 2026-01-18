@@ -65,7 +65,7 @@ public class TrainerNotesServiceImpl implements TrainerNotesService {
                 trainer = trainerRepository.findAll().stream().findFirst().orElse(null);
             }
         }
-        // -----------------------------------------
+
 
         TrainerNotes note = new TrainerNotes();
         note.setAppointment(appointment);

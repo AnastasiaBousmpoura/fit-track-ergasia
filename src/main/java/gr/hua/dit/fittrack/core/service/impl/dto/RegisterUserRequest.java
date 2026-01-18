@@ -13,7 +13,7 @@ public record RegisterUserRequest(
         @NotBlank String lastName,
         String fitnessGoal,
 
-        @NotNull Role role,          // 👈 ΝΕΟ
-        String specialization,       // 👈 μόνο για trainer
-        String area                  // 👈 μόνο για trainer
+        @NotNull Role role,
+        String specialization,
+        String area
 ) {}

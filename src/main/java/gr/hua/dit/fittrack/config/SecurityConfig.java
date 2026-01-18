@@ -73,8 +73,8 @@ public class SecurityConfig {
                                 "/",
                                 "/login",
                                 "/register",
-                                "/about",          // ΠΡΟΣΘΗΚΗ: Η νέα σελίδα οδηγιών
-                                "/about/**",       // ΠΡΟΣΘΗΚΗ: Για τυχόν υποσελίδες
+                                "/about",
+                                "/about/**",
                                 "/error",
                                 "/css/**", "/js/**", "/images/**",
                                 "/trainers",
@@ -83,10 +83,10 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        // TRAINER only (Β)
+
                         .requestMatchers("/trainer/availability/**").hasRole("TRAINER")
 
-                        // everything else needs login
+
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf
@@ -100,12 +100,12 @@ public class SecurityConfig {
                         .permitAll()
                         .successHandler((request, response, authentication) -> {
 
-                            // αν υπάρχει saved request, γύρνα εκεί
+
                             var handler = new SavedRequestAwareAuthenticationSuccessHandler();
                             handler.setDefaultTargetUrl("/"); // fallback
                             handler.setAlwaysUseDefaultTargetUrl(false);
 
-                            // Αν ΔΕΝ υπάρχει saved request, κάνε το δικό σου role redirect:
+
                             boolean hasSaved = request.getSession(false) != null
                                     && request.getSession(false).getAttribute("SPRING_SECURITY_SAVED_REQUEST") != null;
 

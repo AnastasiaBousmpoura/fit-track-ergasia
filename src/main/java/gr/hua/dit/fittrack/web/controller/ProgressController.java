@@ -4,9 +4,12 @@ import gr.hua.dit.fittrack.core.model.entity.ProgressRecord;
 import gr.hua.dit.fittrack.core.model.entity.User;
 import gr.hua.dit.fittrack.core.repository.UserRepository;
 import gr.hua.dit.fittrack.core.service.UserService;
+import gr.hua.dit.fittrack.web.dto.ProgressForm;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +27,6 @@ public class ProgressController {
         this.userRepository = userRepository;
     }
 
-    // Εμφάνιση της φόρμας
     @GetMapping
     public String showProgressForm(Authentication authentication, Model model) {
         if (authentication == null) return "redirect:/login";
@@ -33,38 +35,49 @@ public class ProgressController {
         User user = userService.getUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        ProgressForm form = new ProgressForm();
+        form.setWeight(user.getCurrentWeight());
+        form.setRunningTime(user.getRunningTime());
+        form.setDate(LocalDate.now());
+
+        model.addAttribute("progressForm", form);
         model.addAttribute("user", user);
-        return "add-progress";
+        return "progress"; // Επιστρέφει το αρχείο progress.html
     }
 
-    // Αποθήκευση των δεδομένων
     @PostMapping
     @Transactional
     public String addProgressRecord(Authentication authentication,
-                                    @RequestParam Double currentWeight,
-                                    @RequestParam Double runningTime,
-                                    @RequestParam(required = false) String notes) {
+                                    @Valid @ModelAttribute("progressForm") ProgressForm form,
+                                    BindingResult result,
+                                    Model model) {
 
         if (authentication == null) return "redirect:/login";
+
+        if (result.hasErrors()) {
+            String email = authentication.getName();
+            User user = userService.getUserByEmail(email).orElseThrow();
+            model.addAttribute("user", user);
+            return "progress"; // Επιστροφή στη φόρμα σε περίπτωση λάθους
+        }
 
         String email = authentication.getName();
         User user = userService.getUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Δημιουργία εγγραφής ιστορικού
+        // Μετατροπή DTO σε Entity
         ProgressRecord record = new ProgressRecord();
-        record.setWeight(currentWeight);
-        record.setRunningTime(runningTime);
-        record.setDate(LocalDate.now());
-        record.setNotes(notes);
+        record.setWeight(form.getWeight());
+        record.setRunningTime(form.getRunningTime());
+        record.setDate(form.getDate() != null ? form.getDate() : LocalDate.now());
+        record.setNotes(form.getNotes());
         record.setUser(user);
 
-        // Ενημέρωση τρεχόντων στοιχείων χρήστη
-        user.setCurrentWeight(currentWeight);
-        user.setRunningTime(runningTime);
+        // Ενημέρωση τρεχουσών τιμών χρήστη
+        user.setCurrentWeight(form.getWeight());
+        user.setRunningTime(form.getRunningTime());
         user.getProgressRecords().add(record);
 
-        // Αποθήκευση στη βάση
         userRepository.save(user);
 
         return "redirect:/profile?success";

@@ -19,8 +19,5 @@ public record CreateAppointmentRequest(
         @NotNull AppointmentType type,
         @Size(max = 255) String notes
 ) {
-    // default constructor για Thymeleaf
-//    public CreateAppointmentRequest() {
-//        this(0L, 0L, LocalDateTime.now().plusDays(1), "", "");
-//    }
+
 }

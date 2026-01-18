@@ -19,11 +19,11 @@ public class TrainerNotes {
     @Column(name = "text")
     private String text;
 
-    //Constructor
+
     public TrainerNotes() {
     }
 
-    //Getters and Setters
+
     public Long getId() {
         return id;
     }

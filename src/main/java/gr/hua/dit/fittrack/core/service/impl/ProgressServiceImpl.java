@@ -28,9 +28,7 @@ public class ProgressServiceImpl implements ProgressService {
         this.userRepository = userRepository;
     }
 
-    // ------------------------
-    // 1. addProgress(userId, dto)
-    // ------------------------
+
     @Override
     @Transactional
     public ProgressRecord addProgress(Long userId, AddProgressRequest dto) {
@@ -56,9 +54,7 @@ public class ProgressServiceImpl implements ProgressService {
         return progressRepository.save(record);
     }
 
-    // ------------------------
-    // 2. getProgressForUser(userId)
-    // ------------------------
+
     @Override
     public List<ProgressRecord> getProgressForUser(Long userId) {
 

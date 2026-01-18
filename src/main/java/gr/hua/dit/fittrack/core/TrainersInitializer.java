@@ -15,7 +15,7 @@ public class TrainersInitializer {
     CommandLineRunner initTrainers(
             TrainerRepository trainerRepository,
             PasswordEncoder passwordEncoder,
-            Environment env                       // ⬅️ ΝΕΑ παράμετρος
+            Environment env
     ) {
         return args -> {
 

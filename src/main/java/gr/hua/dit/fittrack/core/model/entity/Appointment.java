@@ -3,8 +3,7 @@ package gr.hua.dit.fittrack.core.model.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-//@Entity
-//@Table(name = "appointments")
+
 @Entity
 @Table(
         name = "appointments",
@@ -32,7 +31,7 @@ public class Appointment {
     @Column(nullable = false)
     private LocalDateTime dateTime;
 
-//    private String type; // π.χ. "Yoga", "Crossfit", "Personal"
+
 
     @Column(length = 80)
     private String location;
@@ -40,9 +39,7 @@ public class Appointment {
     @Column(length = 255)
     private String weatherSummary;
 
-//    private String status = "PENDING"; // Default τιμή για τα νέα ραντεβού
-
-    @Column(length = 2000) // Μεγάλο μήκος για να χωράει το πλάνο
+    @Column(length = 2000)
     private String notes;
 
     @Enumerated(EnumType.STRING)
@@ -50,7 +47,7 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
-    // Constructors
+
     public Appointment() {
     }
 
@@ -64,34 +61,75 @@ public class Appointment {
         this.weatherSummary = weatherSummary;
     }
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public Trainer getTrainer() { return trainer; }
-    public void setTrainer(Trainer trainer) { this.trainer = trainer; }
+    public User getUser() {
+        return user;
+    }
 
-    public LocalDateTime getDateTime() { return dateTime; }
-    public void setDateTime(LocalDateTime dateTime) { this.dateTime = dateTime; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-//    public String getType() { return type; }
-//    public void setType(String type) { this.type = type; }
+    public Trainer getTrainer() {
+        return trainer;
+    }
 
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
+    public void setTrainer(Trainer trainer) {
+        this.trainer = trainer;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
 
-    public String getWeatherSummary() { return weatherSummary; }
-    public void setWeatherSummary(String weatherSummary) { this.weatherSummary = weatherSummary; }
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
 
-    public AppointmentType getType() { return type; }
-    public void setType(AppointmentType type) { this.type = type; }
+    public String getNotes() {
+        return notes;
+    }
 
-    public AppointmentStatus getStatus() { return status; }
-    public void setStatus(AppointmentStatus status) { this.status = status; }
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getWeatherSummary() {
+        return weatherSummary;
+    }
+
+    public void setWeatherSummary(String weatherSummary) {
+        this.weatherSummary = weatherSummary;
+    }
+
+    public AppointmentType getType() {
+        return type;
+    }
+
+    public void setType(AppointmentType type) {
+        this.type = type;
+    }
+
+    public AppointmentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AppointmentStatus status) {
+        this.status = status;
+    }
 }

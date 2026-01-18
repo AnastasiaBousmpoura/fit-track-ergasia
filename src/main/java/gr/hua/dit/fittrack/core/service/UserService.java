@@ -1,7 +1,6 @@
 package gr.hua.dit.fittrack.core.service;
 
 import gr.hua.dit.fittrack.core.model.entity.User;
-
 import java.util.Optional;
 
 public interface UserService {

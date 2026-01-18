@@ -2,11 +2,11 @@ package gr.hua.dit.fittrack.core.service.impl.dto;
 
 public record LoginResult(
         boolean success,
-        String reason,      // μήνυμα λάθους αν αποτύχει
-        String accessToken, // το JWT
-        String tokenType,   // π.χ. "Bearer"
-        long expiresIn,     // σε δευτερόλεπτα π.χ. 3600
-        String role,        // USER ή TRAINER
+        String reason,
+        String accessToken,
+        String tokenType,
+        long expiresIn,
+        String role,
         Long userId
 ) {
 

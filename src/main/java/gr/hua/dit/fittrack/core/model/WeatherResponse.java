@@ -8,15 +8,36 @@ public class WeatherResponse {
     private Double temperatureC;
     private String summary;
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public String getLocation() {
+        return location;
+    }
 
-    public LocalDateTime getDateTime() { return dateTime; }
-    public void setDateTime(LocalDateTime dateTime) { this.dateTime = dateTime; }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-    public Double getTemperatureC() { return temperatureC; }
-    public void setTemperatureC(Double temperatureC) { this.temperatureC = temperatureC; }
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
 
-    public String getSummary() { return summary; }
-    public void setSummary(String summary) { this.summary = summary; }
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public Double getTemperatureC() {
+        return temperatureC;
+    }
+
+    public void setTemperatureC(Double temperatureC) {
+        this.temperatureC = temperatureC;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
 }

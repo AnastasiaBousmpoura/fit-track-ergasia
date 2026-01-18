@@ -2,7 +2,6 @@ package gr.hua.dit.fittrack.core.service;
 
 import gr.hua.dit.fittrack.core.model.entity.TrainerNotes;
 import gr.hua.dit.fittrack.core.service.impl.dto.AddTrainerNoteResult;
-
 import java.util.List;
 
 public interface TrainerNotesService {

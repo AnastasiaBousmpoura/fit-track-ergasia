@@ -29,11 +29,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // ΑΛΛΑΓΗ ΕΔΩ: Προσθήκη FetchType.EAGER για να μην κρασάρει το προφίλ
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProgressRecord> progressRecords = new ArrayList<>();
 
-    // Constructors
+
     public User() {
     }
 
@@ -46,37 +46,93 @@ public class User {
         this.role = role;
     }
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getUserFirstName() { return userFirstName; }
-    public void setUserFirstName(String userFirstName) { this.userFirstName = userFirstName; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getUserLastName() { return userLastName; }
-    public void setUserLastName(String userLastName) { this.userLastName = userLastName; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public String getEmailAddress() { return emailAddress; }
-    public void setEmailAddress(String emailAddress) { this.emailAddress = emailAddress; }
+    public String getPassword() {
+        return password;
+    }
 
-    public String getFitnessGoal() { return fitnessGoal; }
-    public void setFitnessGoal(String fitnessGoal) { this.fitnessGoal = fitnessGoal; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public Double getCurrentWeight() { return currentWeight; }
-    public void setCurrentWeight(Double currentWeight) { this.currentWeight = currentWeight; }
+    public String getUserFirstName() {
+        return userFirstName;
+    }
 
-    public Double getRunningTime() { return runningTime; }
-    public void setRunningTime(Double runningTime) { this.runningTime = runningTime; }
+    public void setUserFirstName(String userFirstName) {
+        this.userFirstName = userFirstName;
+    }
 
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public String getUserLastName() {
+        return userLastName;
+    }
 
-    public List<ProgressRecord> getProgressRecords() { return progressRecords; }
-    public void setProgressRecords(List<ProgressRecord> progressRecords) { this.progressRecords = progressRecords; }
+    public void setUserLastName(String userLastName) {
+        this.userLastName = userLastName;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public String getFitnessGoal() {
+        return fitnessGoal;
+    }
+
+    public void setFitnessGoal(String fitnessGoal) {
+        this.fitnessGoal = fitnessGoal;
+    }
+
+    public Double getCurrentWeight() {
+        return currentWeight;
+    }
+
+    public void setCurrentWeight(Double currentWeight) {
+        this.currentWeight = currentWeight;
+    }
+
+    public Double getRunningTime() {
+        return runningTime;
+    }
+
+    public void setRunningTime(Double runningTime) {
+        this.runningTime = runningTime;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public List<ProgressRecord> getProgressRecords() {
+        return progressRecords;
+    }
+
+    public void setProgressRecords(List<ProgressRecord> progressRecords) {
+        this.progressRecords = progressRecords;
+    }
+
 }

@@ -1,7 +1,6 @@
 package gr.hua.dit.fittrack.core.service;
 
 import gr.hua.dit.fittrack.core.model.WeatherResponse;
-
 import java.time.LocalDateTime;
 
 public interface WeatherService {

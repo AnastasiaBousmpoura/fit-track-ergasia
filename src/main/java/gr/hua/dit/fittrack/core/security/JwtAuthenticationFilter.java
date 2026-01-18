@@ -49,12 +49,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
 
-        // Εδώ άφησε ελεύθερο το login/register API σου
+
         if (path.startsWith("/api/auth")) {
             return true;
         }
 
-        // Φιλτράρουμε μόνο /api/**
+
         return !path.startsWith("/api");
     }
 
@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authorizationHeader = request.getHeader("Authorization");
 
-        // Χωρίς header ή όχι Bearer -> άφησε το request ως unauthenticated.
+
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -76,13 +76,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorizationHeader.substring(7);
 
         try {
-            // Parse + validate token
+
             Claims claims = this.jwtService.parse(token);
             String subject = claims.getSubject(); // π.χ. email
 
             Collection<String> roles = (Collection<String>) claims.get("roles");
 
-            // Μετατροπή String → GrantedAuthority
+
             List<GrantedAuthority> authorities = new ArrayList<>();
             if (roles != null) {
                 for (String role : roles) {
@@ -90,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-            // Δημιουργία principal
+
             User principal = new User(subject, "", authorities);
 
             UsernamePasswordAuthenticationToken authenticationToken =
@@ -99,14 +99,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         } catch (Exception ex) {
-            // Invalid token ή εσωτερικό σφάλμα
+
             LOGGER.warn("JwtAuthenticationFilter failed", ex);
             SecurityContextHolder.clearContext();
             throw new BadCredentialsException("Invalid token");
 
         }
 
-        // Αν όλα ΟΚ -> συνέχισε στο επόμενο φίλτρο / controller
+
         filterChain.doFilter(request, response);
     }
 }

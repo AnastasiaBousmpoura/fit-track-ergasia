@@ -2,8 +2,6 @@ package gr.hua.dit.fittrack.core.service.impl;
 
 import gr.hua.dit.fittrack.core.service.WeatherService;
 import gr.hua.dit.fittrack.core.model.WeatherResponse;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 
 

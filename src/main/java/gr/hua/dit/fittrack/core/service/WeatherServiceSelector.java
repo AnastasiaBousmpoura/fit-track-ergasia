@@ -1,6 +1,5 @@
 package gr.hua.dit.fittrack.core.service;
 
-
 import gr.hua.dit.fittrack.config.WeatherProperties;
 import gr.hua.dit.fittrack.core.service.impl.MockWeatherService;
 import gr.hua.dit.fittrack.core.service.impl.WeatherApiService;

@@ -16,6 +16,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     boolean existsByTrainer_IdAndDateTime(Long trainerId, LocalDateTime dateTime);
     boolean existsByUser_IdAndDateTime(Long userId, LocalDateTime dateTime);
 
-    // Μετράει τα ενεργά μελλοντικά ραντεβού του χρήστη
+
     long countByUser_IdAndDateTimeAfterAndStatusNot(Long userId, LocalDateTime dateTime, gr.hua.dit.fittrack.core.model.entity.AppointmentStatus status);
 }

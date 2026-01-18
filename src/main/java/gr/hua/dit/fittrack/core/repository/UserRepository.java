@@ -11,14 +11,12 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // Για register: έλεγχος αν υπάρχει ήδη χρήστης με αυτό το email (case-insensitive)
     boolean existsByEmailAddressIgnoreCase(String emailAddress);
 
-    // Για login: φέρε τον χρήστη με αυτό το email
     Optional<User> findByEmailAddressIgnoreCase(String emailAddress);
+
     Optional<User> findByEmailAddress(String emailAddress);
 
-    // Αν θες να παίρνεις όλους τους trainers / users
     List<User> findByRole(Role role);
 }
 

@@ -25,10 +25,8 @@ public class WeatherApiService implements WeatherService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeatherApiService.class);
 
-    // Αν το API σου έχει OAuth token endpoint (Routee-like), το βάζεις εδώ:
     private static final String AUTHENTICATION_PATH = "/oauth/token";
 
-    // Endpoints του weather API (προσαρμόζεις)
     private static final String WEATHER_PATH = "/weather";
     private static final String WEATHER_SECURED_PATH = "/weather/secured";
     private static final String SOMETHING_PATH = "/something";
@@ -43,9 +41,6 @@ public class WeatherApiService implements WeatherService {
         this.weatherProperties = weatherProperties;
     }
 
-    // --------------------------------------------------
-    // Secured token acquisition (optional, Routee-like)
-    // --------------------------------------------------
 
     @SuppressWarnings("rawtypes")
     @Cacheable("weatherAccessToken")
@@ -84,9 +79,6 @@ public class WeatherApiService implements WeatherService {
         return (String) response.getBody().get("access_token");
     }
 
-    // --------------------------------------------------
-    // GET (public)
-    // --------------------------------------------------
 
     @Override
     public WeatherResponse getWeatherFor(final LocalDateTime dateTime, final String location) {
@@ -115,9 +107,6 @@ public class WeatherApiService implements WeatherService {
         return response.getBody();
     }
 
-    // --------------------------------------------------
-    // POST (mock)
-    // --------------------------------------------------
 
     @Override
     public String postSomethingToWeatherApi(final String message) {
@@ -149,9 +138,6 @@ public class WeatherApiService implements WeatherService {
         return response.getBody();
     }
 
-    // --------------------------------------------------
-    // GET (secured) with Authorization: Bearer <token>
-    // --------------------------------------------------
 
     @Override
     public WeatherResponse getWeatherForSecured(final LocalDateTime dateTime, final String location) {
@@ -166,7 +152,7 @@ public class WeatherApiService implements WeatherService {
                 .queryParam("location", location)
                 .toUriString();
 
-        final String token = this.getAccessToken(); // cached / mock if missing credentials
+        final String token = this.getAccessToken();
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Authorization", "Bearer " + token);

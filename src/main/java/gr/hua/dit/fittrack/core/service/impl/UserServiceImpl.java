@@ -4,7 +4,6 @@ import gr.hua.dit.fittrack.core.model.entity.User;
 import gr.hua.dit.fittrack.core.repository.UserRepository;
 import gr.hua.dit.fittrack.core.service.UserService;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service

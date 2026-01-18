@@ -89,13 +89,38 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     // Getters / Updaters
-    @Override public Optional<Appointment> findById(Long id) { return appointmentRepository.findById(id); }
-    @Override public List<Appointment> getAppointmentsForTrainer(String email) { return appointmentRepository.findByTrainer_Email(email); }
-    @Override public List<Appointment> getAppointmentsByUser(String email) { return appointmentRepository.findByUser_EmailAddress(email); }
-    @Override public List<Appointment> getAppointmentsByTrainer(String email) { return appointmentRepository.findByTrainer_Email(email); }
-    @Override @Transactional public void deleteAppointment(Long id) { appointmentRepository.deleteById(id); }
-    @Override @Transactional public void updateStatus(Long id, String status) { appointmentRepository.findById(id).ifPresent(a -> a.setStatus(AppointmentStatus.valueOf(status.toUpperCase()))); }
-    @Override @Transactional public void updateNotes(Long id, String notes) { appointmentRepository.findById(id).ifPresent(a -> a.setNotes(notes)); }
-    @Override @Transactional public void cancelAppointment(Long id) { appointmentRepository.findById(id).ifPresent(a -> a.setStatus(AppointmentStatus.CANCELLED)); }
-    @Override @Transactional public void setTrainerAvailability(Long tId, LocalDateTime s, LocalDateTime e) { /* Placeholder */ }
+    @Override public Optional<Appointment> findById(Long id) {
+        return appointmentRepository.findById(id);
+    }
+
+    @Override public List<Appointment> getAppointmentsForTrainer(String email) {
+        return appointmentRepository.findByTrainer_Email(email);
+    }
+
+    @Override public List<Appointment> getAppointmentsByUser(String email) {
+        return appointmentRepository.findByUser_EmailAddress(email);
+    }
+
+    @Override public List<Appointment> getAppointmentsByTrainer(String email) {
+        return appointmentRepository.findByTrainer_Email(email);
+    }
+
+    @Override @Transactional public void deleteAppointment(Long id) {
+        appointmentRepository.deleteById(id);
+    }
+    @Override @Transactional public void updateStatus(Long id, String status) {
+        appointmentRepository.findById(id).ifPresent(a -> a.setStatus(AppointmentStatus.valueOf(status.toUpperCase())));
+    }
+
+    @Override @Transactional public void updateNotes(Long id, String notes) {
+        appointmentRepository.findById(id).ifPresent(a -> a.setNotes(notes));
+    }
+
+    @Override @Transactional public void cancelAppointment(Long id) {
+        appointmentRepository.findById(id).ifPresent(a -> a.setStatus(AppointmentStatus.CANCELLED));
+    }
+
+    @Override @Transactional public void setTrainerAvailability(Long tId, LocalDateTime s, LocalDateTime e) {
+        /* Placeholder */
+    }
 }

@@ -46,40 +46,6 @@ public class AppointmentController {
         this.trainerRepository = trainerRepository;
     }
 
-    // ------------------------
-    // Προβολή φόρμας δημιουργίας (GET)
-    // ------------------------
-//    @GetMapping("/create")
-//    public String showCreateForm(@RequestParam("trainerId") Long trainerId, Model model, Authentication authentication) {
-//        // 1. Βρίσκουμε τον συνδεδεμένο χρήστη από το email του
-//        String email = authentication.getName();
-//        User currentUser = userService.getUserByEmail(email)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        // 2. Βρίσκουμε τον Trainer για τον οποίο γίνεται η κράτηση
-//        Trainer trainer = trainerService.findTrainerById(trainerId)
-//                .orElseThrow(() -> new RuntimeException("Trainer not found"));
-//
-//        // 3. Αρχικοποιούμε το Request με τα ID του χρήστη και του trainer
-//        // Αυτό διασφαλίζει ότι τα hidden fields στη φόρμα θα έχουν τιμές
-//        CreateAppointmentRequest request = new CreateAppointmentRequest(
-//                currentUser.getId(),
-//                trainerId,
-//                null, // Το dateTime θα επιλεγεί από το dropdown
-//                AppointmentType.INDOOR,
-//                ""
-//        );
-//
-//        // 4. Φέρνουμε τα διαθέσιμα slots από το Service
-//        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(trainerId);
-//
-//        // 5. Προσθήκη στο Model για το Thymeleaf
-//        model.addAttribute("appointmentRequest", request);
-//        model.addAttribute("trainer", trainer);
-//        model.addAttribute("availableSlots", availableSlots);
-//
-//        return "create-appointment";
-//    }
 
     @GetMapping("/create")
     public String showCreateForm(@RequestParam(value = "trainerId", required = false) Long trainerId,
@@ -118,24 +84,21 @@ public class AppointmentController {
     }
 
 
-    // ------------------------
-    // Υποβολή φόρμας (POST)
-    // ------------------------
     @PostMapping("/create")
     public String processCreate(@Valid @ModelAttribute("appointmentRequest") CreateAppointmentRequest request,
                                 BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
 
-        // Αν υπάρχουν σφάλματα επικύρωσης (π.χ. κενά πεδία)
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("trainer", trainerService.findTrainerById(request.trainerId()).orElse(null));
             model.addAttribute("availableSlots", appointmentService.getAvailableSlots(request.trainerId()));
             return "create-appointment";
         }
 
-        // Κλήση του Service για δημιουργία του ραντεβού
+
         CreateAppointmentResult result = appointmentService.createAppointment(request, false);
 
-        // Αν το Service επιστρέψει αποτυχία (π.χ. η ώρα κλείστηκε ενδιάμεσα)
+
         if (!result.created()) {
             model.addAttribute("errorMessage", result.reason());
             model.addAttribute("trainer", trainerService.findTrainerById(request.trainerId()).orElse(null));
@@ -143,7 +106,6 @@ public class AppointmentController {
             return "create-appointment";
         }
 
-        // Επιτυχία: Ανακατεύθυνση στο προφίλ με μήνυμα
         redirectAttributes.addFlashAttribute("success", "Το ραντεβού σας καταχωρήθηκε επιτυχώς!");
         return "redirect:/profile";
     }

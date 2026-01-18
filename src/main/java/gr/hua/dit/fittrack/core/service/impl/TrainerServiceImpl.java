@@ -23,11 +23,13 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public List<Trainer> findAllTrainers() {
+
         return trainerRepository.findAll();
     }
 
     @Override
     public Optional<Trainer> findTrainerById(Long trainerId) {
+
         return trainerRepository.findById(trainerId);
     }
 }

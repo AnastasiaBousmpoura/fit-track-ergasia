@@ -39,7 +39,7 @@ public class AppointmentViewController {
         this.availabilityRepository = availabilityRepository;
     }
 
-    // Η ΜΕΘΟΔΟΣ ΠΟΥ ΕΛΕΙΠΕ ΚΑΙ ΕΒΓΑΖΕ 404
+
     @GetMapping("/my-appointments")
     public String listAppointments(Authentication authentication, Model model) {
         String email = authentication.getName();

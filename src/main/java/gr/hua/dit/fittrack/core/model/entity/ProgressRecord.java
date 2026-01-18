@@ -9,11 +9,11 @@ import java.time.LocalDate;
 public class ProgressRecord {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Αλλαγή σε IDENTITY για συμβατότητα με User
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false) // Lazy loading για καλύτερη απόδοση
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
@@ -24,15 +24,15 @@ public class ProgressRecord {
     @Column(nullable = false)
     private double weight;
 
-    @Column(name = "running_time") // Προσθήκη για την απαίτηση της εκφώνησης
+    @Column(name = "running_time")
     private double runningTime;
 
-    @Column(length = 500) // Ορίζουμε ένα λογικό όριο για τις σημειώσεις
+    @Column(length = 500)
     private String notes;
 
     // Constructors
     public ProgressRecord() {
-        this.date = LocalDate.now(); // Προεπιλογή η σημερινή ημερομηνία
+        this.date = LocalDate.now();
     }
 
     public ProgressRecord(User user, double weight, double runningTime, String notes) {
@@ -44,21 +44,52 @@ public class ProgressRecord {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+    public User getUser() {
+        return user;
+    }
 
-    public double getWeight() { return weight; }
-    public void setWeight(double weight) { this.weight = weight; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    public double getRunningTime() { return runningTime; }
-    public void setRunningTime(double runningTime) { this.runningTime = runningTime; }
+    public LocalDate getDate() {
+        return date;
+    }
 
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public double getRunningTime() {
+        return runningTime;
+    }
+
+    public void setRunningTime(double runningTime) {
+        this.runningTime = runningTime;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
 }
