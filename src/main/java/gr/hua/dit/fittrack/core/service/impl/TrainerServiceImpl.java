@@ -23,13 +23,13 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public List<Trainer> findAllTrainers() {
-
+        // Επιστρέφει όλους τους trainers στη βάση
         return trainerRepository.findAll();
     }
 
     @Override
     public Optional<Trainer> findTrainerById(Long trainerId) {
-
+        // Επιστρέφει έναν trainer με βάση το ID, αν υπάρχει
         return trainerRepository.findById(trainerId);
     }
 }

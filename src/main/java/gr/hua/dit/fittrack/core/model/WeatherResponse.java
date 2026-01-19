@@ -3,11 +3,12 @@ package gr.hua.dit.fittrack.core.model;
 import java.time.LocalDateTime;
 
 public class WeatherResponse {
-    private String location;
-    private LocalDateTime dateTime;
-    private Double temperatureC;
-    private String summary;
+    private String location; // Τοποθεσία
+    private LocalDateTime dateTime; // Ημερομηνία & ώρα
+    private Double temperatureC; // Θερμοκρασία °C
+    private String summary; // Περιγραφή καιρού
 
+    // Getters & Setters
     public String getLocation() {
         return location;
     }

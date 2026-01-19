@@ -20,6 +20,7 @@ public class TrainerViewController {
         this.trainerService = trainerService;
     }
 
+    // ---Λίστα όλων των trainers ---
     @GetMapping
     public String showPublicTrainers(Model model) {
         // Τραβάμε όλους τους trainers για να τους δει ο Επισκέπτης [cite: 184]

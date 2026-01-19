@@ -42,11 +42,12 @@ public class TrainerNotesServiceImpl implements TrainerNotesService {
     @Override
     @Transactional
     public AddTrainerNoteResult addNotes(Long appointmentId, String text) {
-
+        // Έλεγχος για κενό ή άδειο κείμενο
         if (text == null || text.isBlank()) {
             return AddTrainerNoteResult.fail("Το κείμενο είναι υποχρεωτικό");
         }
 
+        // Βρίσκουμε το ραντεβού
         Appointment appointment = appointmentRepository.findById(appointmentId).orElse(null);
         if (appointment == null) {
             return AddTrainerNoteResult.fail("Το ραντεβού δεν βρέθηκε");
@@ -66,7 +67,7 @@ public class TrainerNotesServiceImpl implements TrainerNotesService {
             }
         }
 
-
+        // Δημιουργία νέας σημείωσης
         TrainerNotes note = new TrainerNotes();
         note.setAppointment(appointment);
         note.setTrainer(trainer);
@@ -79,6 +80,7 @@ public class TrainerNotesServiceImpl implements TrainerNotesService {
 
     @Override
     public List<TrainerNotes> listNotes(Long appointmentId) {
+        // Επιστρέφει όλες τις σημειώσεις για ένα ραντεβού
         return notesRepository.findByAppointmentId(appointmentId);
     }
 }

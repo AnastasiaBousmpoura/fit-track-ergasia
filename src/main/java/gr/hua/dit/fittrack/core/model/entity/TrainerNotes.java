@@ -8,22 +8,22 @@ public class TrainerNotes {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Long id; // PK
 
     @ManyToOne
-    private Appointment appointment;
+    private Appointment appointment; // Σχετικό ραντεβού
 
     @ManyToOne
-    private Trainer trainer;
+    private Trainer trainer; // Trainer που έγραψε τη σημείωση
 
     @Column(name = "text")
-    private String text;
+    private String text; // Κείμενο σημείωσης
 
-
+    // Constructor
     public TrainerNotes() {
     }
 
-
+    // Getters & Setters
     public Long getId() {
         return id;
     }

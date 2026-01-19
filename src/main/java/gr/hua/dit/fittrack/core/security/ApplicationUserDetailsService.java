@@ -25,7 +25,7 @@ public class ApplicationUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
+        // Έλεγχος αν είναι trainer
         System.out.println("LOGIN attempt email=" + email);
 
         Optional<Trainer> trainer = trainerRepository.findByEmail(email);
@@ -41,6 +41,7 @@ public class ApplicationUserDetailsService implements UserDetailsService {
                     .build();
         }
 
+        // Έλεγχος αν είναι απλός χρήστης
         Optional<User> user = userRepository.findByEmailAddress(email);
         System.out.println("user found? " + user.isPresent());
 
@@ -54,7 +55,7 @@ public class ApplicationUserDetailsService implements UserDetailsService {
                     .build();
         }
 
+        // Αν δεν βρεθεί
         throw new UsernameNotFoundException("User or Trainer not found with email: " + email);
     }
 }
-

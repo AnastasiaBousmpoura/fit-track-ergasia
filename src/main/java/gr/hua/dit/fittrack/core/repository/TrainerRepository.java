@@ -10,9 +10,6 @@ import java.util.Optional;
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
 
-    Optional<Trainer> findByEmail(String email);
+    Optional<Trainer> findByEmail(String email); // Βρες trainer με βάση το email
 
-    List<Trainer> findByArea(String area);
-
-    List<Trainer> findBySpecialization(String specialization);
 }

@@ -30,6 +30,7 @@ public class TrainerAvailabilityController {
         this.availabilityRepository = availabilityRepository;
     }
 
+    // --- Εμφάνιση φόρμας διαθεσιμότητας ---
     @GetMapping
     public String showAvailabilityForm(Authentication authentication, Model model) {
         String email = authentication.getName();
@@ -42,6 +43,7 @@ public class TrainerAvailabilityController {
         return "trainer-availability"; // Το HTML που φτιάξαμε πριν
     }
 
+    // --- Αποθήκευση νέας ημερομηνίας διαθεσιμότητας ---
     @PostMapping("/save")
     public String saveAvailability(@RequestParam("availableDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                    Authentication authentication) {
@@ -63,6 +65,7 @@ public class TrainerAvailabilityController {
         return "redirect:/appointments/my-appointments";
     }
 
+    // --- Διαγραφή υπάρχουσας διαθεσιμότητας ---
     @PostMapping("/delete/{id}")
     public String deleteAvailability(@PathVariable Long id) {
         availabilityRepository.deleteById(id);

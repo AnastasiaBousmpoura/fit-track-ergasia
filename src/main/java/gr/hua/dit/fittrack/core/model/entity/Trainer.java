@@ -7,21 +7,21 @@ public class Trainer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // PK
 
-    private String firstName;
-    private String lastName;
+    private String firstName; // Όνομα
+    private String lastName; // Επίθετο
 
     @Column(unique = true)
-    private String email;
+    private String email; // Email μοναδικό
 
-    private String password;
-    private String role;
+    private String password; // Κωδικός
+    private Role role; // Ρόλος
 
-    private String specialization;
-    private String area;
+    private String specialization; // Ειδικότητα
+    private String area; // Περιοχή
 
-
+    // Constructors
     public Trainer() {}
 
 
@@ -32,11 +32,11 @@ public class Trainer {
         this.password = password;
         this.specialization = specialization;
         this.area = area;
-        this.role = "ROLE_TRAINER";
+        this.role = Role.TRAINER;
     }
 
 
-
+    // Getters & Setters
     public Long getId() {
         return id;
     }
@@ -77,11 +77,11 @@ public class Trainer {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

@@ -8,7 +8,8 @@ import java.util.List;
 @Repository
 public interface TrainerNotesRepository extends JpaRepository<TrainerNotes,Long> {
 
-    List<TrainerNotes> findByAppointmentId(Long apointmentid);
+    List<TrainerNotes> findByAppointmentId(Long apointmentid); // Σημειώσεις για συγκεκριμένο ραντεβού
 
-    List<TrainerNotes> findByTrainerId(Long trainerid);
+    List<TrainerNotes> findByTrainerId(Long trainerid); // Σημειώσεις από συγκεκριμένο trainer
+
 }

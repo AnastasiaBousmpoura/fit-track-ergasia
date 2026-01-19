@@ -22,6 +22,7 @@ public class AuthViewController {
         this.authService = authService;
     }
 
+    // --- Σελίδα login ---
     @GetMapping("/login")
     public String login() {
         return "login";
@@ -42,10 +43,10 @@ public class AuthViewController {
                         ""      // area
                 )
         );
-        return "register";
+        return "register"; //Επιστρέφει στην register.html
     }
 
-
+    // --- Υποβολή φόρμας εγγραφής ---
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute("registerRequest") RegisterUserRequest request,
                                BindingResult result, Model model) {

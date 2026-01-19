@@ -9,11 +9,11 @@ public class AvailabilityForm {
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime startTime;
+    private LocalDateTime startTime; // Ώρα έναρξης διαθεσιμότητας
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime endTime;
+    private LocalDateTime endTime; // Ώρα λήξης διαθεσιμότητας
 
     public AvailabilityForm() {} // χρειάζεται για Spring
 
@@ -22,6 +22,7 @@ public class AvailabilityForm {
        this.endTime = endTime;
     }
 
+    // Getters & Setters
     public LocalDateTime getStartTime() {
        return startTime;
     }

@@ -65,9 +65,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws IOException, ServletException {
 
+        // Παίρνει το Authorization header
         String authorizationHeader = request.getHeader("Authorization");
 
-
+        // Αν δεν υπάρχει Bearer token → συνέχισε
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -90,7 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-
+            // Δημιουργία authenticated χρήστη
             User principal = new User(subject, "", authorities);
 
             UsernamePasswordAuthenticationToken authenticationToken =
@@ -99,7 +100,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         } catch (Exception ex) {
-
+            // Άκυρο token
             LOGGER.warn("JwtAuthenticationFilter failed", ex);
             SecurityContextHolder.clearContext();
             throw new BadCredentialsException("Invalid token");

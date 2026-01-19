@@ -1,5 +1,6 @@
 package gr.hua.dit.fittrack.core;
 
+import gr.hua.dit.fittrack.core.model.entity.Role;
 import gr.hua.dit.fittrack.core.model.entity.Trainer;
 import gr.hua.dit.fittrack.core.repository.TrainerRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -7,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.core.env.Environment;   // ⬅️ ΝΕΟ import
-
+//Αρχικοποιούμε 2 trainers στη βάση
 @Configuration
 public class TrainersInitializer {
 
@@ -33,7 +34,7 @@ public class TrainersInitializer {
                 t1.setPassword(passwordEncoder.encode("123456"));
                 t1.setSpecialization("CrossFit & Ενδυνάμωση");
                 t1.setArea("Καλλιθέα");
-                t1.setRole("ROLE_TRAINER");
+                t1.setRole(Role.TRAINER);
                 trainerRepository.save(t1);
 
                 Trainer t2 = new Trainer();
@@ -43,7 +44,7 @@ public class TrainersInitializer {
                 t2.setPassword(passwordEncoder.encode("123456"));
                 t2.setSpecialization("Yoga & Pilates");
                 t2.setArea("Αθήνα Κέντρο");
-                t2.setRole("ROLE_TRAINER");
+                t2.setRole(Role.TRAINER);
                 trainerRepository.save(t2);
 
                 System.out.println("✅ Οι Trainers προστέθηκαν στη βάση!");

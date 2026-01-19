@@ -17,6 +17,7 @@ public class TrainerNotesController {
         this.trainerNotesService = trainerNotesService;
     }
 
+    // --- Εμφάνιση σημειώσεων για συγκεκριμένο ραντεβού ---
     @GetMapping("/{appointmentId}/notes")
     public String notes(@PathVariable Long appointmentId, Model model) {
         try {
@@ -31,6 +32,7 @@ public class TrainerNotesController {
         return "appointments-notes";
     }
 
+    // --- Προσθήκη νέας σημείωσης ---
     @PostMapping("/{appointmentId}/notes")
     public String addNote(
             @PathVariable Long appointmentId,

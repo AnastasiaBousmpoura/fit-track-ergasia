@@ -11,12 +11,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    boolean existsByEmailAddressIgnoreCase(String emailAddress);
+    Optional<User> findByEmailAddress(String emailAddress); // Βρες χρήστη με βάση το email
 
-    Optional<User> findByEmailAddressIgnoreCase(String emailAddress);
-
-    Optional<User> findByEmailAddress(String emailAddress);
-
-    List<User> findByRole(Role role);
 }
-

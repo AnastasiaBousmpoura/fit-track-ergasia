@@ -11,24 +11,24 @@ public class ProgressRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Long id; // PK
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    private User user;
+    private User user; // Χρήστης
 
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDate date; // Ημερομηνία καταγραφής
 
     @Column(nullable = false)
-    private double weight;
+    private double weight; // Βάρος
 
     @Column(name = "running_time")
-    private double runningTime;
+    private double runningTime; // Χρόνος τρεξίματος
 
     @Column(length = 500)
-    private String notes;
+    private String notes; // Σημειώσεις
 
     // Constructors
     public ProgressRecord() {

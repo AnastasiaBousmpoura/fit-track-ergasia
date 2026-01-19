@@ -28,19 +28,7 @@ public class AppointmentRestController {
         this.appointmentService = appointmentService;
     }
 
-    // Δημιουργία ραντεβού
-//    @PostMapping
-//    public ResponseEntity<?> createAppointment(@Valid @RequestBody CreateAppointmentRequest request) {
-//        // Χρησιμοποιούμε default method χωρίς notify
-//        CreateAppointmentResult result = appointmentService.createAppointment(request);
-//
-//        if (result.created()) {
-//            return ResponseEntity.ok(result.appointment());
-//        } else {
-//            return ResponseEntity.badRequest().body(result.reason());
-//        }
-//    }
-
+    // --- Δημιουργία ραντεβού (POST /api/appointments) ---
     @Operation(summary = "Create appointment")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Created"),
@@ -71,18 +59,7 @@ public class AppointmentRestController {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, result.reason());
     }
 
-
-    // Ακύρωση ραντεβού
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteAppointment(@PathVariable Long id) {
-//        try {
-//            appointmentService.deleteAppointment(id);
-//            return ResponseEntity.ok("Το ραντεβού ακυρώθηκε με επιτυχία.");
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-//        }
-//    }
-
+    // --- Διαγραφή ραντεβού (DELETE /api/appointments/{id}) ---
     @Operation(summary = "Delete appointment")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Deleted"),
@@ -97,6 +74,7 @@ public class AppointmentRestController {
                                     "{\"timestamp\":\"2026-01-10T00:00:00Z\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Full authentication is required\",\"path\":\"/api/appointments/123\",\"fields\":null}"
                             )))
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAppointment(@PathVariable Long id) {
         try {

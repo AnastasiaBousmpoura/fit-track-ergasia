@@ -14,11 +14,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * REST API Resource class for managing Weather information.
+ * REST API Resource για διαχείριση πληροφοριών καιρού.
  *
- * External API example (GET, POST, secured).
- *
- * @author Dimitris Gkoulis
+ * Παράδειγμα εξωτερικού API (GET, POST, secured).
  */
 @RestController
 @RequestMapping(value = "/api/v1/weather", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,7 +32,8 @@ public class WeatherResource {
     }
 
     // --------------------------------------------------
-    // GET (External API)
+    // GET (Εξωτερικό API)
+    // Επιστρέφει τις καιρικές συνθήκες για συγκεκριμένη ημερομηνία και τοποθεσία
     // --------------------------------------------------
 
     @GetMapping(value = "")
@@ -54,7 +53,8 @@ public class WeatherResource {
     }
 
     // --------------------------------------------------
-    // POST (External API – mock example)
+    // POST (Εξωτερικό API – παράδειγμα mock)
+    // Στέλνει ένα μήνυμα στο API και επιστρέφει το αποτέλεσμα
     // --------------------------------------------------
 
     @PostMapping(value = "/something", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -68,7 +68,9 @@ public class WeatherResource {
     }
 
     // --------------------------------------------------
-    // GET (Secured External API – Bearer token)
+    // GET (Εξωτερικό API με token)
+    // Επιστρέφει τις καιρικές συνθήκες για συγκεκριμένη ημερομηνία και τοποθεσία,
+    // χρησιμοποιώντας authentication (π.χ. Bearer token)
     // --------------------------------------------------
 
     @GetMapping(value = "/secured")

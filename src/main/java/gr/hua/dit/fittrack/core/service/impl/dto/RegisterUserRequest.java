@@ -7,13 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record RegisterUserRequest(
-        @NotBlank @Email String email,
-        @NotBlank @Size(min = 4, max = 24) String password,
-        @NotBlank String firstName,
-        @NotBlank String lastName,
-        String fitnessGoal,
+        @NotBlank @Email String email, // email χρήστη
+        @NotBlank @Size(min = 4, max = 24) String password, // κωδικός
+        @NotBlank String firstName, // όνομα
+        @NotBlank String lastName, // επώνυμο
+        String fitnessGoal, // στόχος fitness
 
-        @NotNull Role role,
-        String specialization,
-        String area
+        @NotNull Role role, // ρόλος (USER / TRAINER)
+        String specialization, // ειδικότητα trainer
+        String area // περιοχή trainer
 ) {}

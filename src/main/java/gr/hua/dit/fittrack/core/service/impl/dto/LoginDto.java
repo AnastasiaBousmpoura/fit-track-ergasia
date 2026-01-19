@@ -1,6 +1,6 @@
 package gr.hua.dit.fittrack.core.service.impl.dto;
 
 public record LoginDto(
-        String username,
-        String password
+        String username, // username χρήστη
+        String password // κωδικός χρήστη
 ) {}

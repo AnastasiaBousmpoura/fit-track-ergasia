@@ -9,12 +9,12 @@ import java.time.LocalDate;
 public record AddProgressRequest(
 
         @NotNull
-        LocalDate date,
+        LocalDate date,   // Η ημερομηνία καταγραφής
 
         @NotNull
         @Positive
-        Double weight,
+        Double weight,   // Βάρος χρήστη (πρέπει να είναι θετικό)
 
         @Size(max = 500)
-        String notes
+        String notes     // Προαιρετικές σημειώσεις (μέχρι 500 χαρακτήρες)
 ) {}

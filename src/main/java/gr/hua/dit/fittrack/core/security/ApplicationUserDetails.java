@@ -9,10 +9,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class ApplicationUserDetails implements UserDetails {
-    private final long personId;
-    private final String emailAddress;
-    private final String passwordHash;
-    private final Role role;
+    private final long personId; // ID χρήστη
+    private final String emailAddress; // Email χρήστη
+    private final String passwordHash; // Κωδικός
+    private final Role role; // Ρόλος
 
     public ApplicationUserDetails(final long personId,
                                   final String emailAddress,
@@ -31,10 +31,12 @@ public class ApplicationUserDetails implements UserDetails {
         this.role = role;
     }
 
+    // Επιστρέφει ID
     public long personId() {
         return this.personId;
     }
 
+    // Επιστρέφει ρόλο
     public Role role() {
         return this.role;
     }
@@ -64,20 +66,20 @@ public class ApplicationUserDetails implements UserDetails {
         return this.emailAddress;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    //@Override
+    //public boolean isAccountNonExpired() {
+    //    return true;
+    //}
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+   // @Override
+   // public boolean isAccountNonLocked() {
+    //    return true;
+    //}
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+   // @Override
+    //public boolean isCredentialsNonExpired() {
+      //  return true;
+    //}
 
     @Override
     public boolean isEnabled() {

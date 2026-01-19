@@ -8,13 +8,14 @@ public class TrainerAvailability {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // PK
 
     @ManyToOne
-    private Trainer trainer;
+    private Trainer trainer; // Trainer
 
-    private LocalDate availableDate;
+    private LocalDate availableDate; // Ημερομηνία διαθεσιμότητας
 
+    // Getters & Setters
     public Long getId() {
         return id;
     }

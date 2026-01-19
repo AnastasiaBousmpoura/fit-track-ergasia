@@ -18,7 +18,8 @@ import java.util.List;
 @Service
 public class JwtService {
 
-    private final Key key;
+    private final Key key; // Κλειδί υπογραφής JWT
+    // Στοιχεία επαλήθευσης
     private final String issuer;
     private final String audience;
     private final long ttlMinutes;
@@ -35,7 +36,7 @@ public class JwtService {
         this.ttlMinutes = ttlMinutes;
     }
 
-    /** Issue token for multiple roles */
+    // Δημιουργία JWT με ρόλους
     public String issue(String subject, Collection<String> roles) {
 
         Instant now = Instant.now();
@@ -51,12 +52,12 @@ public class JwtService {
                 .compact();
     }
 
-    /** Convenience for one role */
+    // Δημιουργία JWT με έναν ρόλο
     public String issue(String subject, String role) {
         return issue(subject, List.of(role));
     }
 
-    /** Parse + validate token */
+    // Ανάλυση & έλεγχος JWT
     public Claims parse(String token) {
         return Jwts.parserBuilder()
                 .requireIssuer(issuer)

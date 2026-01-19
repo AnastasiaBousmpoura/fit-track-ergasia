@@ -24,10 +24,16 @@ public final class CurrentUserProvider {
         return Optional.empty();
     }
 
+    /**
+     * Επιστρέφει τον τρέχοντα χρήστη ή πετάει exception αν δεν υπάρχει
+     */
     public CurrentUser requireCurrentUser () {
         return this.getCurrentUser().orElseThrow(() -> new SecurityException("not authenticated"));
     }
 
+    /**
+     * Επιστρέφει το ID του χρήστη μόνο αν είναι TRAINER, αλλιώς exception
+     */
     public long requiredTrainerId () {
         final var currentUser = this.requireCurrentUser();
         if (currentUser.role() != Role.TRAINER) throw new SecurityException("Trainer type/role required");

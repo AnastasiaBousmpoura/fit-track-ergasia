@@ -4,7 +4,7 @@ import gr.hua.dit.fittrack.core.service.WeatherService;
 import gr.hua.dit.fittrack.core.model.WeatherResponse;
 import java.time.LocalDateTime;
 
-
+// Mock υλοποίηση του WeatherService για δοκιμές
 public class MockWeatherService implements WeatherService {
 
     @Override

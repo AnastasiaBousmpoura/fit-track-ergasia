@@ -10,14 +10,15 @@ public class CreateProgressForm {
 
     @NotNull
     @PastOrPresent
-    private LocalDate date;
+    private LocalDate date; // Ημερομηνία καταχώρησης προόδου
 
     @NotNull
     @Positive
-    private Double weight;
+    private Double weight; // Βάρος χρήστη (πρέπει > 0)
 
-    private String notes;
+    private String notes; // Προαιρετικές σημειώσεις
 
+    // Getters & Setters
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
 

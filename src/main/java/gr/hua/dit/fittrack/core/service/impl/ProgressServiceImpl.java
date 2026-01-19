@@ -39,12 +39,13 @@ public class ProgressServiceImpl implements ProgressService {
         if (dto == null) {
             throw new IllegalArgumentException("progress data is required");
         }
-
+        // Βρίσκουμε τον χρήστη από τη βάση
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new IllegalArgumentException("User not found: " + userId)
                 );
 
+        // Δημιουργία και αποθήκευση νέας εγγραφής προόδου
         ProgressRecord record = new ProgressRecord();
         record.setUser(user);
         record.setDate(dto.date());
@@ -62,6 +63,7 @@ public class ProgressServiceImpl implements ProgressService {
             throw new IllegalArgumentException("userId is required");
         }
 
+        // Επιστροφή όλων των εγγραφών προόδου για τον χρήστη
         return progressRepository.findByUser_Id(userId);
     }
 }

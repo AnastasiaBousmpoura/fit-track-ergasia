@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TrainerAvailabilityRepository extends JpaRepository<TrainerAvailability, Long> {
-    List<TrainerAvailability> findByTrainer_Id(Long trainerId);
-    boolean existsByTrainer_IdAndAvailableDate(Long trainerId, LocalDate availableDate);
+
+    List<TrainerAvailability> findByTrainer_Id(Long trainerId); // Διαθεσιμότητες συγκεκριμένου trainer
+    boolean existsByTrainer_IdAndAvailableDate(Long trainerId, LocalDate availableDate); // Έλεγχος αν υπάρχει διαθέσιμη μέρα
 }

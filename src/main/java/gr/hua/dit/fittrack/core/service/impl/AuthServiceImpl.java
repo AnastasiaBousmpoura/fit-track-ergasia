@@ -30,10 +30,14 @@ public class AuthServiceImpl implements AuthService {
         this.trainerRepository = trainerRepository;
     }
 
+    /**
+     * Register χρήστη ή trainer ανάλογα με το role.
+     */
     @Override
     @Transactional
     public void registerUser(RegisterUserRequest request) {
 
+        // ---------- TRAINER ----------
         if (request.role() == Role.TRAINER) {
 
             if (trainerRepository.findByEmail(request.email()).isPresent()) {
@@ -70,10 +74,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-
+    /**
+     * Login χρήστη
+     */
     @Override
     public LoginResult login(LoginRequest request) {
         return userRepository.findByEmailAddress(request.email())
+                // Έλεγχος κωδικού
                 .filter(user -> passwordEncoder.matches(request.password(), user.getPassword()))
                 .map(user -> {
                     String token = jwtService.issue(user.getEmailAddress(), user.getRole().name());
@@ -85,6 +92,7 @@ public class AuthServiceImpl implements AuthService {
                             user.getId()
                     );
                 })
+                // Αποτυχία login
                 .orElseGet(() -> LoginResult.fail("Λάθος email ή κωδικός πρόσβασης"));
     }
 }

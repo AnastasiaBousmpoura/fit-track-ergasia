@@ -10,8 +10,6 @@ import java.util.List;
 @Repository
 public interface ProgressRepository extends JpaRepository<ProgressRecord, Long> {
 
-    List<ProgressRecord> findByUser_Id(Long userId);
+    List<ProgressRecord> findByUser_Id(Long userId); // Όλα τα αρχεία προόδου χρήστη
 
-    List<ProgressRecord> findByUser_IdAndDate(Long userId, LocalDate date);
 }
-

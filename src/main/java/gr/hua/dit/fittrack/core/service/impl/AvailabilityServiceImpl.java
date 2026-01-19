@@ -22,12 +22,17 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         this.trainerRepository = trainerRepository;
     }
 
+    /**
+     * Δημιουργεί διαθεσιμότητα trainer για συγκεκριμένη ημερομηνία.
+     */
     @Transactional
     @Override
     public CreateAvailabilityResult createSlot(Long trainerId, LocalDateTime start, LocalDateTime end) {
+        // Δεν επιτρέπονται παρελθοντικές ημερομηνίες
         LocalDate date = start.toLocalDate();
         if (date.isBefore(LocalDate.now())) return CreateAvailabilityResult.fail("Invalid date");
 
+        // Έλεγχος trainer
         Trainer trainer = trainerRepository.findById(trainerId).orElse(null);
         if (trainer == null) return CreateAvailabilityResult.fail("Trainer not found");
 
@@ -41,11 +46,17 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         return CreateAvailabilityResult.success(availabilityRepository.save(slot));
     }
 
+    /**
+     * Επιστρέφει όλες τις διαθέσιμες ημερομηνίες ενός trainer.
+     */
     @Override
     public List<TrainerAvailability> listSlotsForTrainer(Long trainerId) {
         return availabilityRepository.findByTrainer_Id(trainerId);
     }
 
+    /**
+     * Διαγράφει διαθέσιμη ημερομηνία αν ανήκει στον trainer.
+     */
     @Transactional
     @Override
     public void deleteSlot(Long trainerId, Long slotId) {

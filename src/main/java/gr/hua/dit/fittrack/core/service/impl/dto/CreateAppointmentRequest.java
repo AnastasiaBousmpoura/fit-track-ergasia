@@ -10,14 +10,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 public record CreateAppointmentRequest(
-        @NotNull Long userId,
-        @NotNull Long trainerId,
+        @NotNull Long userId, // ID χρήστη που κλείνει το ραντεβού
+        @NotNull Long trainerId, // ID του trainer
         @NotNull
         @NotNull
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-        LocalDateTime dateTime,
-        @NotNull AppointmentType type,
-        @Size(max = 255) String notes
+        LocalDateTime dateTime, // Ημερομηνία & ώρα ραντεβού
+        @NotNull AppointmentType type, // Τύπος ραντεβού (π.χ. Indoor, outdoor)
+        @Size(max = 255) String notes // Προαιρετικές σημειώσεις (μέχρι 255 χαρακτήρες)
 ) {
 
 }

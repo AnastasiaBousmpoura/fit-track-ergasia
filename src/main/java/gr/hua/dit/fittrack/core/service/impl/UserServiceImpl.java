@@ -17,6 +17,7 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    // Επιστρέφει τον χρήστη με βάση το email, αν υπάρχει
     @Override
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmailAddress(email);
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateProgress(User user, Double currentWeight, Double runningTime) {
+        // Ενημερώνει τα πεδία progress του χρήστη και αποθηκεύει τις αλλαγές
         user.setCurrentWeight(currentWeight);
         user.setRunningTime(runningTime);
         userRepository.save(user);

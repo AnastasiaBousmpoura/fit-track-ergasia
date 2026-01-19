@@ -18,35 +18,35 @@ public class Appointment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // PK
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User user; // Χρήστης
 
     @ManyToOne
     @JoinColumn(name = "trainer_id", nullable = false)
-    private Trainer trainer;
+    private Trainer trainer; // Trainer
 
     @Column(nullable = false)
-    private LocalDateTime dateTime;
+    private LocalDateTime dateTime; // Ημερομηνία & ώρα ραντεβού
 
 
 
     @Column(length = 80)
-    private String location;
+    private String location; // Τοποθεσία
 
     @Column(length = 255)
-    private String weatherSummary;
+    private String weatherSummary; // Περιγραφή καιρού
 
     @Column(length = 2000)
-    private String notes;
+    private String notes; // Σημειώσεις
 
     @Enumerated(EnumType.STRING)
-    private AppointmentType type;
+    private AppointmentType type; // Τύπος ραντεβού
 
     @Enumerated(EnumType.STRING)
-    private AppointmentStatus status;
+    private AppointmentStatus status; // Κατάσταση ραντεβού
 
     public Appointment() {
     }
@@ -61,6 +61,7 @@ public class Appointment {
         this.weatherSummary = weatherSummary;
     }
 
+    // Getters & Setters
     public Long getId() {
         return id;
     }

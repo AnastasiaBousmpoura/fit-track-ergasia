@@ -16,10 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
 
-/**
- * REST-based implementation of {@link WeatherService}.
- * (Professor-style, similar to RouteeSmsService)
- */
+// Υλοποίηση που κάνει πραγματικά HTTP requests σε εξωτερικό weather API
 
 public class WeatherApiService implements WeatherService {
 
@@ -79,7 +76,7 @@ public class WeatherApiService implements WeatherService {
         return (String) response.getBody().get("access_token");
     }
 
-
+    // GET request για πραγματικό καιρό
     @Override
     public WeatherResponse getWeatherFor(final LocalDateTime dateTime, final String location) {
         if (dateTime == null) throw new NullPointerException();
@@ -107,7 +104,7 @@ public class WeatherApiService implements WeatherService {
         return response.getBody();
     }
 
-
+    // POST request σε API για κάποιο μήνυμα
     @Override
     public String postSomethingToWeatherApi(final String message) {
         if (message == null) throw new NullPointerException();
@@ -138,7 +135,7 @@ public class WeatherApiService implements WeatherService {
         return response.getBody();
     }
 
-
+    // GET request για secured API
     @Override
     public WeatherResponse getWeatherForSecured(final LocalDateTime dateTime, final String location) {
         if (dateTime == null) throw new NullPointerException();

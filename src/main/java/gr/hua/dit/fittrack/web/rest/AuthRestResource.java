@@ -30,6 +30,7 @@ public class AuthRestResource {
         this.authService = authService;
     }
 
+    // --- Login χρήστη (JWT) ---
     @Operation(summary = "JWT login")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Login success"),
@@ -51,7 +52,7 @@ public class AuthRestResource {
         LoginResult result = authService.login(request);
 
         if (!result.success()) {
-            // 401 όπως κάνει ο καθηγητής
+            // 401
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, result.reason());
         }
 

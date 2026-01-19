@@ -31,9 +31,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.weatherService = weatherService;
     }
 
+    /**
+     * Δημιουργία νέου ραντεβού
+     */
     @Override
     @Transactional
     public CreateAppointmentResult createAppointment(CreateAppointmentRequest req, boolean notify) {
+        // Δε δέχεται παρελθοντικές ημερομηνίες
         if (req.dateTime().isBefore(LocalDateTime.now())) return CreateAppointmentResult.fail("Όχι παρελθοντικές ημερομηνίες.");
 
         // Κανόνας: Μέγιστο 3 ενεργά μελλοντικά ραντεβού
@@ -51,13 +55,16 @@ public class AppointmentServiceImpl implements AppointmentService {
             return CreateAppointmentResult.fail("Το slot είναι ήδη πιασμένο.");
         }
 
+        // Φόρτωση χρήστη & trainer
         User user = userRepository.findById(req.userId()).orElse(null);
         Trainer trainer = trainerRepository.findById(req.trainerId()).orElse(null);
         if (user == null || trainer == null) return CreateAppointmentResult.fail("Χρήστης/Trainer δεν βρέθηκε.");
 
+        // Δημιουργία appointment
         Appointment appt = new Appointment(user, trainer, req.dateTime(), req.type(), req.notes(), "Athens", null);
         appt.setStatus(AppointmentStatus.PENDING);
 
+        // Καιρός μόνο για outdoor
         if (req.type() == AppointmentType.OUTDOOR) {
             try {
                 var weather = weatherService.getWeatherFor(req.dateTime(), "Athens");
@@ -68,6 +75,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         return CreateAppointmentResult.success(appointmentRepository.save(appt));
     }
 
+    /**
+     * Επιστρέφει όλες τις διαθέσιμες μελλοντικές ημερομηνίες trainer.
+     */
     @Override
     public List<LocalDateTime> getAvailableSlots(Long trainerId) {
         List<LocalDateTime> slots = new ArrayList<>();
@@ -80,6 +90,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             }
         });
 
+        // Αφαίρεση ήδη κλεισμένων ραντεβού trainer
         List<LocalDateTime> booked = appointmentRepository.findByTrainer_Id(trainerId).stream()
                 .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
                 .map(Appointment::getDateTime).toList();

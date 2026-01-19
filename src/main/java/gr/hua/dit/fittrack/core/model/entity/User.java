@@ -11,29 +11,29 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Long id; // PK
 
     @Column(unique = true, nullable = false)
-    private String username;
+    private String username; // Username μοναδικό
 
-    private String password;
-    private String userFirstName;
-    private String userLastName;
-    private String emailAddress;
+    private String password; // Κωδικός
+    private String userFirstName; // Όνομα
+    private String userLastName; // Επίθετο
+    private String emailAddress; // Email
 
-    private String fitnessGoal;
+    private String fitnessGoal; // Στόχος fitness
 
-    private Double currentWeight;
-    private Double runningTime;
+    private Double currentWeight; // Τρέχον βάρος
+    private Double runningTime; // Χρόνος τρεξίματος
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role; // Ρόλος χρήστη
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<ProgressRecord> progressRecords = new ArrayList<>();
+    private List<ProgressRecord> progressRecords = new ArrayList<>(); // Ιστορικό προόδου
 
-
+    // Constructors
     public User() {
     }
 
@@ -46,7 +46,7 @@ public class User {
         this.role = role;
     }
 
-
+    // Getters & Setters
     public Long getId() {
         return id;
     }

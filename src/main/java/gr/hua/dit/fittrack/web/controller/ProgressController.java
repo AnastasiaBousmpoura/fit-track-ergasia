@@ -27,6 +27,7 @@ public class ProgressController {
         this.userRepository = userRepository;
     }
 
+    // --- Φόρμα για προσθήκη προόδου ---
     @GetMapping
     public String showProgressForm(Authentication authentication, Model model) {
         if (authentication == null) return "redirect:/login";
@@ -45,6 +46,7 @@ public class ProgressController {
         return "progress"; // Επιστρέφει το αρχείο progress.html
     }
 
+    // --- Υποβολή φόρμας προόδου ---
     @PostMapping
     @Transactional
     public String addProgressRecord(Authentication authentication,
