@@ -1,31 +1,35 @@
 package gr.hua.dit.fittrack.core.service.impl;
 
 import gr.hua.dit.fittrack.config.WeatherProperties;
-import gr.hua.dit.fittrack.core.service.WeatherService;
 import gr.hua.dit.fittrack.core.model.WeatherResponse;
+import gr.hua.dit.fittrack.core.service.WeatherService;
+import gr.hua.dit.fittrack.web.dto.OpenWeatherForecastResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
-// Υλοποίηση που κάνει πραγματικά HTTP requests σε εξωτερικό weather API
-
+@Service
 public class WeatherApiService implements WeatherService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeatherApiService.class);
 
+    // Τα παλιά paths τα αφήνω για συμβατότητα, αλλά ΔΕΝ τα χρησιμοποιούμε πια με OpenWeather.
     private static final String AUTHENTICATION_PATH = "/oauth/token";
-
-    private static final String WEATHER_PATH = "/weather";
-    private static final String WEATHER_SECURED_PATH = "/weather/secured";
     private static final String SOMETHING_PATH = "/something";
 
     private final RestTemplate restTemplate;
@@ -38,128 +42,113 @@ public class WeatherApiService implements WeatherService {
         this.weatherProperties = weatherProperties;
     }
 
-
+    /**
+     * OpenWeather δεν χρησιμοποιεί OAuth token, αλλά κρατάμε τη μέθοδο λόγω interface/εργασίας.
+     */
     @SuppressWarnings("rawtypes")
     @Cacheable("weatherAccessToken")
     public String getAccessToken() {
-        LOGGER.info("Requesting Weather API Access Token");
-
-        // Αν δεν έχεις OAuth στο weather API, μπορείς να αφήσεις mock token.
-        final String appId = this.weatherProperties.getAppId();
-        final String appSecret = this.weatherProperties.getAppSecret();
-
-        if (appId == null || appId.isBlank() || appSecret == null || appSecret.isBlank()) {
-            LOGGER.warn("Weather API appId/appSecret missing -> returning mock token");
-            return "mock-token";
-        }
-
-        final String credentials = appId + ":" + appSecret;
-        final String encoded = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-
-        final String url = UriComponentsBuilder
-                .fromHttpUrl(this.weatherProperties.getBaseUrl())
-                .path(AUTHENTICATION_PATH)
-                .toUriString();
-
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Authorization", "Basic " + encoded);
-        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        final HttpEntity<String> request = new HttpEntity<>("grant_type=client_credentials", httpHeaders);
-        final ResponseEntity<Map> response =
-                this.restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
-
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new IllegalStateException("Weather API token request failed");
-        }
-
-        return (String) response.getBody().get("access_token");
+        LOGGER.info("OpenWeather: access token not required (returning mock)");
+        return "not-needed-for-openweather";
     }
 
-    // GET request για πραγματικό καιρό
+    /**
+     * ΠΡΑΓΜΑΤΙΚΟ external call σε OpenWeatherMap (forecast).
+     *
+     * baseUrl: https://api.openweathermap.org/data/2.5
+     * endpoint: /forecast?q={location}&appid={apiKey}&units=metric
+     *
+     * Επιλέγουμε τον forecast χρόνο που είναι πιο κοντά στο dateTime.
+     */
     @Override
     public WeatherResponse getWeatherFor(final LocalDateTime dateTime, final String location) {
         if (dateTime == null) throw new NullPointerException();
         if (location == null) throw new NullPointerException();
         if (location.isBlank()) throw new IllegalArgumentException();
 
-        final String url = UriComponentsBuilder
-                .fromHttpUrl(this.weatherProperties.getBaseUrl())
-                .path(WEATHER_PATH)
-                .queryParam("dateTime", dateTime.toString())
-                .queryParam("location", location)
-                .toUriString();
-
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        if (this.weatherProperties.getApiKey() != null && !this.weatherProperties.getApiKey().isBlank()) {
-            httpHeaders.set("X-Api-Key", this.weatherProperties.getApiKey());
+        final String apiKey = this.weatherProperties.getApiKey();
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalStateException("Missing weather.apiKey (OpenWeather API key)");
         }
 
-        final HttpEntity<Void> entity = new HttpEntity<>(httpHeaders);
-        final ResponseEntity<WeatherResponse> response =
-                this.restTemplate.exchange(url, HttpMethod.GET, entity, WeatherResponse.class);
+        final String url = UriComponentsBuilder
+                .fromHttpUrl(this.weatherProperties.getBaseUrl()) // π.χ. https://api.openweathermap.org/data/2.5
+                .path("/forecast")
+                .queryParam("q", location)      // π.χ. "Athens,GR"
+                .queryParam("appid", apiKey)
+                .queryParam("units", "metric")
+                .toUriString();
 
-        LOGGER.info("Weather response: {}", response);
+        try {
+            final ResponseEntity<OpenWeatherForecastResponse> response =
+                    this.restTemplate.exchange(
+                            url,
+                            HttpMethod.GET,
+                            new HttpEntity<>(new HttpHeaders()),
+                            OpenWeatherForecastResponse.class
+                    );
 
-        return response.getBody();
+            if (!response.getStatusCode().is2xxSuccessful()
+                    || response.getBody() == null
+                    || response.getBody().getList() == null
+                    || response.getBody().getList().isEmpty()) {
+                LOGGER.warn("OpenWeather returned empty response for location={}", location);
+                return null;
+            }
+
+            // target time στο timezone μας
+            final ZoneId zone = ZoneId.of("Europe/Athens");
+            final Instant target = dateTime.atZone(zone).toInstant();
+
+            final OpenWeatherForecastResponse.Item nearest = response.getBody().getList().stream()
+                    .min(Comparator.comparingLong(it -> Math.abs(it.getDt() - target.getEpochSecond())))
+                    .orElse(null);
+
+            if (nearest == null || nearest.getWeather() == null || nearest.getWeather().isEmpty()) {
+                LOGGER.warn("OpenWeather cannot match nearest forecast item for location={}", location);
+                return null;
+            }
+
+            final String main = nearest.getWeather().get(0).getMain();           // Rain/Clear/Clouds
+            final String description = nearest.getWeather().get(0).getDescription();
+            final double temp = (nearest.getMain() != null) ? nearest.getMain().getTemp() : Double.NaN;
+
+            WeatherResponse wr = new WeatherResponse();
+            wr.setLocation(location);
+            wr.setDateTime(dateTime);
+            wr.setTemperatureC(Double.isNaN(temp) ? null : temp);
+
+            String summary = (main != null ? main : "Weather");
+            if (description != null && !description.isBlank()) summary += " (" + description + ")";
+            if (!Double.isNaN(temp)) summary += " - " + temp + "°C";
+            wr.setSummary(summary);
+
+            LOGGER.info("OpenWeather matched: location={}, summary={}", location, summary);
+            return wr;
+
+        } catch (Exception e) {
+            LOGGER.error("OpenWeather call failed for location={}: {}", location, e.getMessage(), e);
+            return null;
+        }
     }
 
-    // POST request σε API για κάποιο μήνυμα
+    /**
+     * OpenWeather δεν υποστηρίζει POST "message" endpoint.
+     * Το κρατάμε για την εργασία ως stub.
+     */
     @Override
     public String postSomethingToWeatherApi(final String message) {
         if (message == null) throw new NullPointerException();
         if (message.isBlank()) throw new IllegalArgumentException();
-
-        final String url = UriComponentsBuilder
-                .fromHttpUrl(this.weatherProperties.getBaseUrl())
-                .path(SOMETHING_PATH)
-                .toUriString();
-
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        if (this.weatherProperties.getApiKey() != null && !this.weatherProperties.getApiKey().isBlank()) {
-            httpHeaders.set("X-Api-Key", this.weatherProperties.getApiKey());
-        }
-
-        final Map<String, Object> body = Map.of("message", message);
-        final HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, httpHeaders);
-
-        final ResponseEntity<String> response = this.restTemplate.postForEntity(url, entity, String.class);
-        LOGGER.info("Weather POST response: {}", response);
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            LOGGER.error("Weather POST failed");
-            return "FAILED";
-        }
-
-        return response.getBody();
+        return "NOT_SUPPORTED_BY_OPENWEATHER";
     }
 
-    // GET request για secured API
+    /**
+     * “Secured” version: OpenWeather δεν έχει bearer token auth,
+     * οπότε το κάνουμε ίδιο με getWeatherFor().
+     */
     @Override
     public WeatherResponse getWeatherForSecured(final LocalDateTime dateTime, final String location) {
-        if (dateTime == null) throw new NullPointerException();
-        if (location == null) throw new NullPointerException();
-        if (location.isBlank()) throw new IllegalArgumentException();
-
-        final String url = UriComponentsBuilder
-                .fromHttpUrl(this.weatherProperties.getBaseUrl())
-                .path(WEATHER_SECURED_PATH)
-                .queryParam("dateTime", dateTime.toString())
-                .queryParam("location", location)
-                .toUriString();
-
-        final String token = this.getAccessToken();
-
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Authorization", "Bearer " + token);
-
-        final HttpEntity<Void> entity = new HttpEntity<>(httpHeaders);
-        final ResponseEntity<WeatherResponse> response =
-                this.restTemplate.exchange(url, HttpMethod.GET, entity, WeatherResponse.class);
-
-        LOGGER.info("Weather secured response: {}", response);
-
-        return response.getBody();
+        return getWeatherFor(dateTime, location);
     }
 }

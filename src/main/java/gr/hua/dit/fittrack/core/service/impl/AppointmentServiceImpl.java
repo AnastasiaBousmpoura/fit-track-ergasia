@@ -61,16 +61,26 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (user == null || trainer == null) return CreateAppointmentResult.fail("Χρήστης/Trainer δεν βρέθηκε.");
 
         // Δημιουργία appointment
-        Appointment appt = new Appointment(user, trainer, req.dateTime(), req.type(), req.notes(), "Athens", null);
+        Appointment appt = new Appointment(user, trainer, req.dateTime(), req.type(), req.notes(), "Athens,GR", null);
         appt.setStatus(AppointmentStatus.PENDING);
 
         // Καιρός μόνο για outdoor
         if (req.type() == AppointmentType.OUTDOOR) {
             try {
-                var weather = weatherService.getWeatherFor(req.dateTime(), "Athens");
-                if (weather != null) appt.setWeatherSummary(weather.getSummary());
-            } catch (Exception e) { appt.setWeatherSummary("Weather N/A"); }
+                var weather = weatherService.getWeatherFor(req.dateTime(), "Athens,GR");
+
+                if (weather != null && weather.getSummary() != null && !weather.getSummary().isBlank()) {
+                    appt.setWeatherSummary(weather.getSummary());
+                } else {
+                    appt.setWeatherSummary("Weather N/A");
+                }
+
+            } catch (Exception e) {
+                appt.setWeatherSummary("Weather N/A");
+                e.printStackTrace(); // ΓΙΑ ΝΑ ΔΟΥΜΕ ΤΟ ΣΦΑΛΜΑ ΣΤΟ TERMINAL
+            }
         }
+
 
         return CreateAppointmentResult.success(appointmentRepository.save(appt));
     }

@@ -2,9 +2,11 @@ package gr.hua.dit.fittrack.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 @Configuration
 @ConfigurationProperties(prefix = "weather")
+@Component
 public class WeatherProperties {
 
     /**
@@ -12,16 +14,14 @@ public class WeatherProperties {
      */
     private String baseUrl;
 
+    private String apiKey;
+
     /**
      * Optional client id/secret if your API uses OAuth client_credentials (Routee-like).
      */
     private String appId;
     private String appSecret;
 
-    /**
-     * Optional API key header if the API needs it.
-     */
-    private String apiKey;
 
     public String getBaseUrl() { return baseUrl; }
     public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
