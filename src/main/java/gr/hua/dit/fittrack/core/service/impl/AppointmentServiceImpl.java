@@ -77,7 +77,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
             } catch (Exception e) {
                 appt.setWeatherSummary("Weather N/A");
-                e.printStackTrace(); // ΓΙΑ ΝΑ ΔΟΥΜΕ ΤΟ ΣΦΑΛΜΑ ΣΤΟ TERMINAL
+                e.printStackTrace();
             }
         }
 
